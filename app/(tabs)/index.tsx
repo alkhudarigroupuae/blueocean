@@ -311,7 +311,15 @@ export default function HomeScreen() {
                 activeOpacity={0.7}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
-                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                style={[
+                  styles.actionCard, 
+                  { 
+                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
+                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
+                    borderWidth: isDark ? 1 : 0, // Remove border in light mode
+                    shadowOpacity: isDark ? 0 : 0.05, // Only subtle shadow in light mode
+                  }
+                ]} 
                 onPress={() => router.push('/search')}
               >
                 <Ionicons name="airplane" size={24} color={primaryColor} style={styles.actionIconIonic} />
@@ -324,7 +332,15 @@ export default function HomeScreen() {
                 activeOpacity={0.7}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
-                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                style={[
+                  styles.actionCard, 
+                  { 
+                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
+                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
+                    borderWidth: isDark ? 1 : 0,
+                    shadowOpacity: isDark ? 0 : 0.05,
+                  }
+                ]} 
                 onPress={() => router.push('/search')}
               >
                 <Ionicons name="business" size={24} color={primaryColor} style={styles.actionIconIonic} />
@@ -337,7 +353,15 @@ export default function HomeScreen() {
                 activeOpacity={0.7}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
-                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                style={[
+                  styles.actionCard, 
+                  { 
+                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
+                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
+                    borderWidth: isDark ? 1 : 0,
+                    shadowOpacity: isDark ? 0 : 0.05,
+                  }
+                ]} 
                 onPress={() => router.push('/search')}
               >
                 <Ionicons name="map" size={24} color={primaryColor} style={styles.actionIconIonic} />
@@ -350,7 +374,15 @@ export default function HomeScreen() {
                 activeOpacity={0.7}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
-                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                style={[
+                  styles.actionCard, 
+                  { 
+                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
+                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
+                    borderWidth: isDark ? 1 : 0,
+                    shadowOpacity: isDark ? 0 : 0.05,
+                  }
+                ]} 
                 onPress={() => Alert.alert('Imperial Dining', 'Exclusive restaurants and food tours coming soon! Bon appétit!')}
               >
                 <Ionicons name="restaurant" size={24} color="#EF4444" style={styles.actionIconIonic} />

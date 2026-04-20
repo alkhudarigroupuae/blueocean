@@ -14,7 +14,22 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, o
   const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
 
   return (
-    <TouchableOpacity style={[styles.card, isDark && { backgroundColor: '#0A0A0A', borderColor: '#1A1A1A' }]} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity 
+      style={[
+        styles.card, 
+        isDark ? { 
+          backgroundColor: '#0A0A0A', 
+          borderColor: '#1A1A1A',
+          borderWidth: 1,
+        } : {
+          backgroundColor: '#FFFFFF',
+          borderColor: '#F3F4F6',
+          borderWidth: 1,
+        }
+      ]} 
+      onPress={onPress} 
+      activeOpacity={0.9}
+    >
       <Image source={{ uri: destination.image }} style={styles.image} />
       <View style={styles.overlay}>
         <View style={styles.content}>

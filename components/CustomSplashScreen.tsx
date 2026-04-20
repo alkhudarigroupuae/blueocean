@@ -95,7 +95,7 @@ export const CustomSplashScreen: React.FC<CustomSplashScreenProps> = ({ onFinish
         <View style={styles.textContainer}>
           <Text style={styles.brandName}>{branding.companyName.toUpperCase()}</Text>
           <View style={styles.divider} />
-          <Text style={styles.tagline}>{branding.tagline}</Text>
+          <Text style={styles.tagline}>Establishing Imperial Connection...</Text>
         </View>
 
         <View style={styles.loaderContainer}>

@@ -55,7 +55,20 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChangeText, place
   const isDark = theme === 'dark';
 
   return (
-    <View style={[styles.searchContainer, isDark && { backgroundColor: '#0A0A0A', borderColor: '#27272A', borderWidth: 1 }]}>
+    <View style={[
+      styles.searchContainer, 
+      isDark ? { 
+        backgroundColor: '#0A0A0A', 
+        borderColor: '#27272A', 
+        borderWidth: 1,
+        shadowOpacity: 0,
+      } : {
+        backgroundColor: '#FFFFFF',
+        borderColor: '#F3F4F6',
+        borderWidth: 1,
+        shadowOpacity: 0.05,
+      }
+    ]}>
       <Text style={styles.searchIcon}>🔍</Text>
       <TextInput
         style={[styles.searchInput, isDark && { color: '#FFFFFF' }]}
@@ -216,6 +229,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 0,
+    overflow: 'hidden',
   },
   buttonPrimary: {
     backgroundColor: Colors.primary,

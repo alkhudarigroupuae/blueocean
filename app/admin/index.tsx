@@ -69,8 +69,12 @@ export default function AdminDashboard() {
   const totalProfit = bookings.reduce((sum, b) => sum + (b.totalPrice * (apiSettings.markupPercentage / 100)), 0);
 
   const dynamicStyles = {
-    container: { backgroundColor: isDark ? '#000000' : '#F9FAFB' },
-    card: { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#27272A' : '#E5E7EB' },
+    container: { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
+    card: { 
+      backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
+      borderColor: isDark ? '#27272A' : '#F3F4F6', // Much more subtle border in light mode
+      borderWidth: 1 
+    },
     text: { color: isDark ? '#FFFFFF' : '#111827' },
     subText: { color: isDark ? '#A1A1AA' : '#6B7280' },
   };
@@ -521,7 +525,7 @@ const styles = StyleSheet.create({
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 15, minHeight: 200 },
   emptyText: { fontSize: 13, fontWeight: '600' },
   sideDesc: { fontSize: 13, lineHeight: 18, marginTop: 10, marginBottom: 20 },
-  primaryBtn: { backgroundColor: Colors.primary, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  primaryBtn: { backgroundColor: Colors.primary, paddingVertical: 12, borderRadius: 10, alignItems: 'center', borderWidth: 0, overflow: 'hidden' },
   primaryBtnText: { color: '#000', fontWeight: '800', fontSize: 14 },
   secondaryBtn: { marginTop: 10, paddingVertical: 12, borderRadius: 10, alignItems: 'center', borderWidth: 1 },
   secondaryBtnText: { fontWeight: '700', fontSize: 13 },
