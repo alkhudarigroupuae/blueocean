@@ -39,7 +39,7 @@ export default function DataInspector() {
       ],
       api_metadata: {
         last_sync: new Date().toISOString(),
-        node_server: "Alkhudari-Imperial-Hub-01",
+        node_server: "Imperial-Node-Cluster-01",
         encryption: "RSA-4096"
       }
     }

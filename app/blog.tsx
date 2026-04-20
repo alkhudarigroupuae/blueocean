@@ -30,7 +30,7 @@ const blogPosts = [
   },
   {
     id: '3',
-    title: 'Why Alkhudari Group is Revolutionizing Travel Brokerage',
+    title: 'Why ecommerco.ai is Revolutionizing Travel Brokerage',
     excerpt: 'The new API-centric model is allowing small offices to compete with giants. Here is how you can join the revolution...',
     image: 'https://images.unsplash.com/photo-1502602898657-3e917247a184?w=800&q=80',
     date: 'April 15, 2026',
@@ -57,14 +57,14 @@ export default function BlogScreen() {
   return (
     <View style={[styles.container, dynamicStyles.container]}>
       <Head>
-        <title>Imperial Travel Blog | Alkhudari Group Insights</title>
-        <meta name="description" content="Stay updated with the latest travel trends, luxury hotel reviews, and brokerage news from Alkhudari Group." />
+        <title>Imperial Travel Blog | ecommerco.ai Insights</title>
+        <meta name="description" content="Stay updated with the latest travel trends, luxury hotel reviews, and brokerage news from ecommerco.ai." />
       </Head>
       <Header title="Imperial Blog" showBack onBack={() => router.back()} />
       
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <Text style={[styles.mainTitle, dynamicStyles.text]}>Latest Travel Insights</Text>
-        <Text style={[styles.subtitle, dynamicStyles.subText]}>Expert advice and news from the Alkhudari Imperial Hub</Text>
+        <Text style={[styles.subtitle, dynamicStyles.subText]}>Expert advice and news from the Imperial Hub</Text>
 
         {allPosts.map((post: any) => (
           <TouchableOpacity 

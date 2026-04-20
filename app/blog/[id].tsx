@@ -33,8 +33,8 @@ export default function BlogPostDetail() {
     },
     {
       id: '3',
-      title: 'Why Alkhudari Group is Revolutionizing Travel Brokerage',
-      content: 'The new API-centric model is allowing small offices to compete with giants. By leveraging global distribution systems through simple Imperial handshakes, Alkhudari Group is empowering brokers everywhere to provide world-class service.',
+      title: 'Why ecommerco.ai is Revolutionizing Travel Brokerage',
+      content: 'The new API-centric model is allowing small offices to compete with giants. By leveraging global distribution systems through simple Imperial handshakes, ecommerco.ai is empowering brokers everywhere to provide world-class service.',
       image: 'https://images.unsplash.com/photo-1502602898657-3e917247a184?w=800&q=80',
       createdAt: '2026-04-15T10:00:00Z',
       author: 'Executive Team',
@@ -91,7 +91,7 @@ export default function BlogPostDetail() {
           {/* Default long content if short */}
           {post.content.length < 200 && (
              <Text style={[styles.content, dynamicStyles.text, { marginTop: 20 }]}>
-                Experience the world like never before with Alkhudari Group's premium travel services. 
+                Experience the world like never before with ecommerco.ai's premium travel services. 
                 Our platform provides exclusive access to real-time booking data, luxury destination insights, 
                 and seamless travel management. Whether you are planning a business trip or a family 
                 vacation, our Imperial brokerage system ensures you get the best value and highest 

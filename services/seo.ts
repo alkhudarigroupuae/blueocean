@@ -37,7 +37,7 @@ export const SEO_CONFIG = {
   robotsTxt: `
     User-agent: *
     Allow: /
-    Sitemap: https://ecommerco.ai/sitemap.xml
+    Sitemap: https://travel.ecommerco.ai/sitemap.xml
   `,
   metaTags: {
     home: {

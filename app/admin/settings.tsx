@@ -114,7 +114,7 @@ export default function AdminSettings() {
             style={styles.innerInput}
             value={branding.companyName}
             onChangeText={(val) => setBranding({...branding, companyName: val})}
-            placeholder="e.g. Alkhudari Group"
+            placeholder="e.g. ecommerco.ai"
             placeholderTextColor="#444"
           />
 
@@ -123,7 +123,7 @@ export default function AdminSettings() {
             style={styles.innerInput}
             value={branding.tagline}
             onChangeText={(val) => setBranding({...branding, tagline: val})}
-            placeholder="e.g. Travel & Brokerage"
+            placeholder="e.g. Imperial SaaS Hub"
             placeholderTextColor="#444"
           />
         </View>
@@ -254,7 +254,7 @@ export default function AdminSettings() {
               </View>
 
               <Text style={styles.helperText}>
-                All payments will be routed through this gateway to your Alkhudari Group bank account or wallet.
+                All payments will be routed through this gateway to your Imperial bank account or wallet.
               </Text>
             </View>
           )}

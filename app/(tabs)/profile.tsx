@@ -96,10 +96,10 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Alkhudari Brand Section */}
+        {/* ecommerco.ai Brand Section */}
         <View style={[styles.brandCard, dynamicStyles.card, { alignItems: 'center', backgroundColor: isDark ? '#0A0A0A' : '#F9FAFB' }]}>
           <Logo size="large" />
-          <Text style={[styles.brandTagline, dynamicStyles.subText, { marginTop: 10 }]}>Imperial Travel & Brokerage Platform</Text>
+          <Text style={[styles.brandTagline, dynamicStyles.subText, { marginTop: 10 }]}>Imperial Enterprise SaaS Platform</Text>
         </View>
 
         {/* Menu Items */}
@@ -133,7 +133,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* App Version */}
-        <Text style={[styles.version, dynamicStyles.subText]}>Blue Ocean v1.0.0</Text>
+        <Text style={[styles.version, dynamicStyles.subText]}>ecommerco.ai v1.0.0</Text>
         <View style={styles.bottomPadding} />
       </ScrollView>
 

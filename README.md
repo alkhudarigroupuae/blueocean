@@ -48,4 +48,4 @@ ecommerco.ai is fully compliant with PWA standards:
 Published with ❤️ on Vercel.
 
 ---
-*Built with professional excellence for the Alkhudari Group.*
+*Built with professional excellence for the ecommerco.ai Imperial SaaS Empire.*
