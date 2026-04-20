@@ -29,7 +29,7 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "description": "Imperial Enterprise SaaS & Brokerage Platform",
+      "description": "Imperial Enterprise & Brokerage Platform",
       "shortName": "ecommerco",
       "themeColor": "#FFD400",
       "backgroundColor": "#000000",

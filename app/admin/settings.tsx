@@ -84,7 +84,7 @@ export default function AdminSettings() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>SaaS Core Engine</Text>
+        <Text style={styles.headerTitle}>Imperial Core Engine</Text>
         <TouchableOpacity onPress={handleSave} style={styles.topSaveBtn}>
           <Text style={styles.topSaveText}>Deploy</Text>
         </TouchableOpacity>

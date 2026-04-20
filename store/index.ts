@@ -12,7 +12,7 @@ interface AppState {
   language: 'ar' | 'en' | 'fr' | 'es' | 'de';
   theme: 'light' | 'dark';
   
-  // SaaS / Broker Settings
+  // Imperial Platform Settings
   apiSettings: {
     markupPercentage: number;
     certificates: Array<{
@@ -98,7 +98,7 @@ export const useStore = create<AppState>((set) => ({
     { 
       id: 'n1', 
       title: 'ecommerco.ai V2 Launch', 
-      subtitle: 'The new standard in Enterprise SaaS', 
+      subtitle: 'The new standard in Enterprise Brokerage', 
       content: 'We are proud to announce the launch of ecommerco.ai V2, featuring our proprietary Imperial Handshake engine and OLED-optimized architecture.',
       image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
       createdAt: new Date().toISOString(),
@@ -174,7 +174,7 @@ export const useStore = create<AppState>((set) => ({
       logoType: 'Hybrid',
       primaryColor: '#FFD400',
       companyName: 'ecommerco.ai',
-      tagline: 'Imperial Enterprise SaaS & Brokerage Platform',
+      tagline: 'Imperial Enterprise & Brokerage Platform',
     },
     tenants: [
       {
@@ -185,7 +185,7 @@ export const useStore = create<AppState>((set) => ({
         branding: {
           logoType: 'Hybrid',
           primaryColor: '#FFD400',
-          tagline: 'Imperial Enterprise SaaS & Brokerage Platform',
+          tagline: 'Imperial Enterprise & Brokerage Platform',
         }
       }
     ],

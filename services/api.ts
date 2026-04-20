@@ -58,7 +58,7 @@ export const getDestinationReviews = async (locationId: string): Promise<Review[
     return [
       { id: '1', userName: 'Belal Jr.', rating: 5, comment: 'This system is incredible, the best in the market!', date: '2024-04-18' },
       { id: '2', userName: 'Imperial Traveler', rating: 5, comment: 'Prices are exactly as seen on the airlines.', date: '2024-04-17' },
-      { id: '3', userName: 'SaaS Partner', rating: 4, comment: 'Great comparison engine, very transparent.', date: '2024-04-16' },
+      { id: '3', userName: 'Imperial Partner', rating: 4, comment: 'Great comparison engine, very transparent.', date: '2024-04-16' },
       { id: '4', userName: 'Global Nomad', rating: 5, comment: 'Found the cheapest price to Beirut here.', date: '2024-04-15' },
       { id: '5', userName: 'Elite Broker', rating: 5, comment: 'The analytics are top-notch for business.', date: '2024-04-14' },
     ];
@@ -329,7 +329,7 @@ export const getImperialAnalytics = async (timeRange: string) => {
 
     if (response.status === 200) {
       // If the handshake is successful, we generate metrics based on the real account status
-      // In a full SaaS, this would pull from a Prometheus/Grafana or RapidAPI Stats endpoint
+      // In a full system, this would pull from a Prometheus/Grafana or RapidAPI Stats endpoint
       return {
         totalCalls: 1250 + Math.floor(Math.random() * 100), // Real dynamic variation
         errorRate: 0.02,

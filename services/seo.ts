@@ -41,7 +41,7 @@ export const SEO_CONFIG = {
   `,
   metaTags: {
     home: {
-      title: "ecommerco.ai | Imperial Enterprise SaaS & Brokerage",
+      title: "ecommerco.ai | Imperial Enterprise Brokerage",
       description: "The world's leading enterprise travel brokerage platform. Real-time handshake, zero-compute architecture."
     }
   }

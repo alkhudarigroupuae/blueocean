@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue Ocean - Travel & Booking</title>
+    <title>ecommerco.ai - Imperial Platform</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #F5F8FA;
+            background: #000000;
             min-height: 100vh;
+            color: white;
         }
         
         /* Header */
         .header {
-            background: linear-gradient(135deg, #0066CC 0%, #0091B8 100%);
+            background: #000000;
             padding: 50px 20px 20px;
             color: white;
+            border-bottom: 1px solid #1A1A1A;
         }
         .header-content {
             display: flex;
@@ -28,36 +30,42 @@
             align-items: center;
             gap: 12px;
         }
-        .logo-circle {
+        .logo-box {
             width: 44px;
             height: 44px;
-            background: white;
-            border-radius: 22px;
+            background: #FFD400;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            font-weight: 900;
+            color: black;
         }
         .brand-text h1 {
             font-size: 20px;
-            font-weight: 700;
+            font-weight: 900;
+            color: #FFD400;
+            letter-spacing: 1px;
         }
         .brand-text p {
             font-size: 12px;
             opacity: 0.8;
+            letter-spacing: 2px;
         }
         
         /* Hero */
         .hero {
-            background: linear-gradient(135deg, #0066CC 0%, #0091B8 100%);
+            background: #0A0A0A;
             margin: 20px;
             border-radius: 24px;
             padding: 28px;
             color: white;
+            border: 1px solid #1A1A1A;
         }
         .hero h2 {
             font-size: 26px;
-            font-weight: 700;
+            font-weight: 900;
             margin-bottom: 8px;
         }
         .hero p {
@@ -67,21 +75,23 @@
         
         /* Search */
         .search-bar {
-            background: white;
+            background: #0A0A0A;
             margin: 0 20px 20px;
             padding: 16px 20px;
             border-radius: 16px;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #27272A;
         }
         .search-icon { font-size: 18px; }
         .search-input {
             flex: 1;
             border: none;
+            background: transparent;
             font-size: 16px;
             outline: none;
+            color: white;
         }
         
         /* Section */
@@ -96,276 +106,37 @@
         }
         .section-title {
             font-size: 20px;
-            font-weight: 700;
-            color: #1A1A1A;
-        }
-        .see-all {
-            font-size: 14px;
-            color: #0066CC;
-            font-weight: 600;
-        }
-        
-        /* Cards */
-        .card-scroll {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-        .card-scroll::-webkit-scrollbar { display: none; }
-        
-        .destination-card {
-            min-width: 260px;
-            height: 180px;
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            background: #ddd;
-        }
-        .destination-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .card-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 16px;
-        }
-        .card-rating {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: white;
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #FF6B35;
-        }
-        .card-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-        }
-        .card-location {
-            font-size: 14px;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 8px;
-        }
-        .card-price {
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-        }
-        .card-price span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-        }
-        .card-price strong {
-            font-size: 22px;
-            font-weight: 700;
-            color: white;
-        }
-        
-        /* Quick Actions */
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-        .action-item {
-            background: white;
-            border-radius: 16px;
-            padding: 20px 12px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .action-icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-        .action-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #1A1A1A;
-        }
-        
-        /* Bottom Tab Bar */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0 24px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-        }
-        .tab-item {
-            text-align: center;
-        }
-        .tab-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-        .tab-label {
-            font-size: 11px;
-            color: #999;
-            font-weight: 500;
-        }
-        .tab-item.active .tab-label {
-            color: #0066CC;
-            font-weight: 700;
-        }
-        
-        /* Content area */
-        .content { padding-bottom: 100px; }
-        
-        /* Brand Section */
-        .brand-footer {
-            background: linear-gradient(135deg, #0066CC 0%, #0091B8 100%);
-            margin: 20px;
-            border-radius: 20px;
-            padding: 24px;
-            text-align: center;
-            color: white;
-        }
-        .brand-footer h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
+            font-weight: 900;
+            color: #FFFFFF;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
         <div class="header-content">
             <div class="logo">
-                <div class="logo-circle">🌊</div>
+                <div class="logo-box">E</div>
                 <div class="brand-text">
-                    <h1>Blue Ocean</h1>
-                    <p>Travel & Booking</p>
+                    <h1>ECOMMERCO</h1>
+                    <p>.AI</p>
                 </div>
             </div>
-            <div style="font-size:24px">👤</div>
         </div>
     </div>
 
-    <div class="content">
-        <!-- Search -->
-        <div class="search-bar">
-            <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" placeholder="Where do you want to go?">
-        </div>
-
-        <!-- Hero -->
-        <div class="hero">
-            <h2>Discover Your</h2>
-            <h2>Dream Destination</h2>
-            <p>Book exclusive travel packages with Blue Ocean</p>
-        </div>
-
-        <!-- Featured Destinations -->
-        <div class="section">
-            <div class="section-header">
-                <span class="section-title">Featured Destinations</span>
-                <span class="see-all">See All →</span>
-            </div>
-            <div class="card-scroll">
-                <div class="destination-card">
-                    <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=400" alt="Maldives">
-                    <span class="card-rating">★ 4.9</span>
-                    <div class="card-overlay">
-                        <div class="card-name">Maldives Paradise</div>
-                        <div class="card-location">Maldives</div>
-                        <div class="card-price">
-                            <span>From</span>
-                            <strong>$2,499</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="destination-card">
-                    <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400" alt="Bali">
-                    <span class="card-rating">★ 4.7</span>
-                    <div class="card-overlay">
-                        <div class="card-name">Bali Adventure</div>
-                        <div class="card-location">Indonesia</div>
-                        <div class="card-price">
-                            <span>From</span>
-                            <strong>$1,299</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="destination-card">
-                    <img src="https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=400" alt="Santorini">
-                    <span class="card-rating">★ 4.8</span>
-                    <div class="card-overlay">
-                        <div class="card-name">Santorini Escape</div>
-                        <div class="card-location">Greece</div>
-                        <div class="card-price">
-                            <span>From</span>
-                            <strong>$1,899</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="section">
-            <span class="section-title">Quick Actions</span>
-            <div class="action-grid" style="margin-top:16px">
-                <div class="action-item">
-                    <div class="action-icon">✈️</div>
-                    <div class="action-label">Flights</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">🏨</div>
-                    <div class="action-label">Hotels</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">🚗</div>
-                    <div class="action-label">Tours</div>
-                </div>
-                <div class="action-item">
-                    <div class="action-icon">📋</div>
-                    <div class="action-label">My Bookings</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Blue Ocean Brand -->
-        <div class="brand-footer">
-            <div style="font-size:40px;margin-bottom:12px">🌊</div>
-            <h3>Blue Ocean</h3>
-            <p>Your journey begins with us</p>
-        </div>
+    <div class="hero">
+        <h2>Establishing Imperial Connection</h2>
+        <p>Real-time price brokerage activated.</p>
     </div>
 
-    <!-- Bottom Tab Bar -->
-    <div class="tab-bar">
-        <div class="tab-item active">
-            <div class="tab-icon">🏠</div>
-            <div class="tab-label">Home</div>
-        </div>
-        <div class="tab-item">
-            <div class="tab-icon">🔍</div>
-            <div class="tab-label">Search</div>
-        </div>
-        <div class="tab-item">
-            <div class="tab-icon">📋</div>
-            <div class="tab-label">Bookings</div>
-        </div>
-        <div class="tab-item">
-            <div class="tab-icon">👤</div>
-            <div class="tab-label">Profile</div>
+    <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search destinations..." readonly>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <h3 class="section-title">FEATURED DESTINATIONS</h3>
         </div>
     </div>
 </body>

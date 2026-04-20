@@ -216,7 +216,7 @@ export default function HomeScreen() {
               { label: 'Flights', icon: 'airplane', route: '/search' },
               { label: 'Hotels', icon: 'business', route: '/search' },
               { label: 'Packages', icon: 'map', route: '/search' },
-              { label: 'Dining', icon: 'restaurant', route: null, color: '#EF4444' },
+              { label: 'Dining', icon: 'restaurant', route: '/search' },
             ].map((action, i) => (
               <Animated.View key={i} style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: i === 0 ? 0 : 10 }}>
                 <TouchableOpacity 
@@ -224,9 +224,14 @@ export default function HomeScreen() {
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
                   style={[styles.actionCard, dynamicStyles.card]} 
-                  onPress={() => action.route ? router.push(action.route as any) : Alert.alert('Imperial Dining', 'Exclusive restaurants coming soon!')}
+                  onPress={() => {
+                    if (action.route) {
+                      setSearchQuery(action.label);
+                      router.push(action.route as any);
+                    }
+                  }}
                 >
-                  <Ionicons name={action.icon as any} size={24} color={action.color || primaryColor} style={styles.actionIconIonic} />
+                  <Ionicons name={action.icon as any} size={24} color={primaryColor} style={styles.actionIconIonic} />
                   <Text style={[styles.actionText, dynamicStyles.text]}>{action.label}</Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -248,7 +253,14 @@ export default function HomeScreen() {
               { name: 'Imperial Grill', location: 'Dubai, UAE', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80' },
               { name: 'Al Mahara', location: 'Dubai, UAE', img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80' },
             ].map((item, i) => (
-              <TouchableOpacity key={i} style={[styles.foodCard, dynamicStyles.card]} onPress={() => Alert.alert(item.name, 'Booking available from June 2026')}>
+              <TouchableOpacity 
+                key={i} 
+                style={[styles.foodCard, dynamicStyles.card]} 
+                onPress={() => {
+                  setSearchQuery(item.name);
+                  router.push('/search');
+                }}
+              >
                 <Image source={{ uri: item.img }} style={styles.foodImage} />
                 <View style={{ padding: 12 }}>
                     <Text style={[styles.foodName, dynamicStyles.text]}>{item.name}</Text>

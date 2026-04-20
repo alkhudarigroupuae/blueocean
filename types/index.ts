@@ -1,7 +1,7 @@
 // Theme Colors
 export const Colors = {
   primary: '#FFD400', // CEO's Yellow
-  secondary: '#FFFFFF', // Clean White for SaaS look
+  secondary: '#FFFFFF', // Clean White for Imperial look
   accent: '#FFD400', 
   background: '#000000', // OLED Pure Black
   backgroundLight: '#0A0A0A', // Near Black
