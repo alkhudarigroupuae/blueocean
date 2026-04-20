@@ -62,6 +62,8 @@ export default function HomeScreen() {
       const realData = await getFeaturedDestinations();
       setFeatured(realData.slice(0, 5));
       setPopular(realData.slice(5, 10));
+      // Store all fetched destinations in global state so detail pages can find them
+      setDestinations(realData);
     } catch (error) {
       console.error(error);
     } finally {

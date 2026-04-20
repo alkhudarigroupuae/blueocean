@@ -84,6 +84,7 @@ export default function SearchScreen() {
       });
 
       setResults(sorted);
+      setDestinations(sorted); // Store in global state
       setPage(1);
       setVisibleResults(sorted.slice(0, ITEMS_PER_PAGE));
     } catch (error) {

@@ -10,10 +10,12 @@ import { Colors, PaymentInfo } from '../../types';
 export default function BookingScreen() {
   const router = useRouter();
   const { id, provider, price } = useLocalSearchParams();
-  const { addBooking, apiSettings, theme } = useStore();
+  const { addBooking, apiSettings, theme, destinations } = useStore();
   const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
   const isDark = theme === 'dark';
-  const destination = sampleDestinations.find(d => d.id === id);
+  
+  // Look in global store first, then fallback to sampleDestinations
+  const destination = destinations.find(d => d.id === id) || sampleDestinations.find(d => d.id === id);
 
   const { paymentGateways } = apiSettings;
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'paypal' | 'applePay' | 'googlePay' | 'crypto'>(

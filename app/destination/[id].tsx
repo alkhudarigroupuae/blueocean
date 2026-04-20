@@ -12,11 +12,13 @@ const { width } = Dimensions.get('window');
 
 export default function DestinationDetailScreen() {
   const router = useRouter();
-  const { theme, apiSettings } = useStore();
+  const { theme, apiSettings, destinations } = useStore();
   const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
   const isDark = theme === 'dark';
   const { id } = useLocalSearchParams();
-  const destination = sampleDestinations.find(d => d.id === id);
+  
+  // Look in global store first, then fallback to sampleDestinations
+  const destination = destinations.find(d => d.id === id) || sampleDestinations.find(d => d.id === id);
 
   const [selectedOffer, setSelectedOffer] = useState<PriceOffer | null>(null);
 

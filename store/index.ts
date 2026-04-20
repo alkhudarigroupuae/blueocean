@@ -91,7 +91,7 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set) => ({
-  user: { id: '1', name: 'Blue Ocean Traveler', email: 'traveler@blueocean.com' },
+  user: { id: '1', name: 'Imperial Traveler', email: 'traveler@ecommerco.ai' },
   destinations: [],
   bookings: [],
   news: [
