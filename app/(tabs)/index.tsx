@@ -243,20 +243,60 @@ export default function HomeScreen() {
                <Text style={[styles.foodName, dynamicStyles.text]}>Imperial Grill</Text>
                <Text style={styles.foodLocation}>Dubai, UAE</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Luxury Dining', 'Undersea restaurant booking')}>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Al Mahara', 'Burj Al Arab underwater dining')}>
                <Image source={{ uri: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Luxury Cocktails</Text>
-               <Text style={styles.foodLocation}>Maldives</Text>
+               <Text style={[styles.foodName, dynamicStyles.text]}>Al Mahara</Text>
+               <Text style={styles.foodLocation}>Dubai, UAE</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Sky Dining', 'Dinner in the sky experience')}>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('The Ivy', 'Historic celebrity hotspot')}>
                <Image source={{ uri: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Sky Terrace</Text>
+               <Text style={[styles.foodName, dynamicStyles.text]}>The Ivy</Text>
                <Text style={styles.foodLocation}>London, UK</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Authentic Pasta', 'Traditional Italian cuisine')}>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Le Jules Verne', 'Dining on the Eiffel Tower')}>
                <Image source={{ uri: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Italian Bistro</Text>
-               <Text style={styles.foodLocation}>Rome, Italy</Text>
+               <Text style={[styles.foodName, dynamicStyles.text]}>Le Jules Verne</Text>
+               <Text style={styles.foodLocation}>Paris, France</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Noma', 'World\'s best restaurant experience')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Noma</Text>
+               <Text style={styles.foodLocation}>Copenhagen, Denmark</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Osteria Francescana', 'Massimo Bottura\'s masterpiece')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1550966841-3ee4ad6c107c?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Osteria Francescana</Text>
+               <Text style={styles.foodLocation}>Modena, Italy</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Eleven Madison Park', 'Plant-based fine dining')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Eleven Madison Park</Text>
+               <Text style={styles.foodLocation}>New York, USA</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Gaggan Anand', 'Progressive Indian cuisine')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Gaggan Anand</Text>
+               <Text style={styles.foodLocation}>Bangkok, Thailand</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Odette', 'Modern French in Singapore')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Odette</Text>
+               <Text style={styles.foodLocation}>Singapore</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Central', 'Best of Peruvian biodiversity')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Central</Text>
+               <Text style={styles.foodLocation}>Lima, Peru</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Zuma Beirut', 'Contemporary Japanese dining')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1579027989536-b7b1f875659b?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Zuma</Text>
+               <Text style={styles.foodLocation}>Beirut, Lebanon</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Arzak', 'Basque cuisine pioneers')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Arzak</Text>
+               <Text style={styles.foodLocation}>San Sebastian, Spain</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
