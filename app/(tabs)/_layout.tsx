@@ -34,8 +34,15 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: [styles.tabBar, isDark && { backgroundColor: '#0A0A0A', borderTopColor: '#1A1A1A' }],
-        tabBarShowLabel: false,
+        tabBarShowLabel: false, // This will hide the names (Home, Search, etc.)
+        tabBarStyle: {
+          backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF',
+          borderTopColor: isDark ? '#1A1A1A' : '#E5E7EB',
+          height: 60,
+          paddingBottom: 0,
+        },
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: isDark ? '#444' : '#999',
       }}
     >
       <Tabs.Screen

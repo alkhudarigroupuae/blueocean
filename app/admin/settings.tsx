@@ -15,7 +15,11 @@ export default function AdminSettings() {
   const [markup, setMarkup] = useState(apiSettings.markupPercentage.toString());
   const [providers, setProviders] = useState(apiSettings.providers);
   const [expandedProvider, setExpandedProvider] = useState<string | null>('Booking.com');
+  const [branding, setBranding] = useState(apiSettings.branding);
   
+  // Payment Gateway States
+  const [paymentSettings, setPaymentSettings] = useState(apiSettings.paymentGateways);
+
   // Certificate Modal State
   const [showCertModal, setShowCertModal] = useState(false);
   const [certAlias, setCertAlias] = useState('');
@@ -26,9 +30,15 @@ export default function AdminSettings() {
     updateApiSettings({
       markupPercentage: parseFloat(markup) || 0,
       providers: providers,
+      paymentGateways: paymentSettings,
+      branding: branding,
     });
     Alert.alert('Imperial Success', 'System configuration has been deployed.');
     router.back();
+  };
+
+  const updatePaymentDetail = (field: keyof typeof paymentSettings, value: string) => {
+    setPaymentSettings({ ...paymentSettings, [field]: value });
   };
 
   const addCertificate = () => {
@@ -81,6 +91,43 @@ export default function AdminSettings() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Branding & Assets Section */}
+        <Text style={styles.sectionTitle}>BRANDING & ASSETS</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Application Logo Type</Text>
+          <View style={styles.typeSelector}>
+            {['Icon', 'FullText', 'Hybrid'].map(type => (
+              <TouchableOpacity 
+                key={type} 
+                style={[styles.typeBtn, branding.logoType === type && styles.activeTypeBtn]}
+                onPress={() => setBranding({...branding, logoType: type as any})}
+              >
+                <Text style={[styles.typeBtnText, branding.logoType === type && styles.activeTypeBtnText]}>{type}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          
+          <View style={styles.divider} />
+          
+          <Text style={styles.label}>Company Name</Text>
+          <TextInput
+            style={styles.innerInput}
+            value={branding.companyName}
+            onChangeText={(val) => setBranding({...branding, companyName: val})}
+            placeholder="e.g. Alkhudari Group"
+            placeholderTextColor="#444"
+          />
+
+          <Text style={styles.label}>Tagline</Text>
+          <TextInput
+            style={styles.innerInput}
+            value={branding.tagline}
+            onChangeText={(val) => setBranding({...branding, tagline: val})}
+            placeholder="e.g. Travel & Brokerage"
+            placeholderTextColor="#444"
+          />
+        </View>
+
         {/* Profit Engine Section */}
         <Text style={styles.sectionTitle}>PROFIT ENGINE (BROKERAGE)</Text>
         <View style={styles.card}>
@@ -100,8 +147,120 @@ export default function AdminSettings() {
           </View>
         </View>
 
-        {/* Security Certificates Section like in image */}
-        <Text style={styles.sectionTitle}>SECURITY CERTIFICATES</Text>
+        {/* Payment Gateways Section - NEW */}
+        <Text style={styles.sectionTitle}>PAYMENT GATEWAY HUB</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Active Gateway</Text>
+          <View style={styles.typeSelector}>
+            {['Stripe', 'Tap', 'NOWPayments', 'PayPal', 'Manual'].map(gateway => (
+              <TouchableOpacity 
+                key={gateway} 
+                style={[styles.typeBtn, paymentSettings.activeGateway === gateway && styles.activeTypeBtn]}
+                onPress={() => setPaymentSettings({...paymentSettings, activeGateway: gateway as any})}
+              >
+                <Text style={[styles.typeBtnText, paymentSettings.activeGateway === gateway && styles.activeTypeBtnText]}>{gateway}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {paymentSettings.activeGateway !== 'None' && (
+            <View style={styles.expandedContent}>
+              <View style={styles.divider} />
+              
+              {paymentSettings.activeGateway === 'PayPal' ? (
+                <>
+                  <Text style={styles.innerLabel}>PayPal Client ID</Text>
+                  <TextInput
+                    style={[styles.innerInput, { marginBottom: 15 }]}
+                    value={paymentSettings.paypalClientId}
+                    onChangeText={(val) => setPaymentSettings({...paymentSettings, paypalClientId: val})}
+                    placeholder="Enter PayPal Client ID..."
+                    placeholderTextColor="#333"
+                  />
+                  <Text style={styles.innerLabel}>PayPal Secret Key</Text>
+                  <TextInput
+                    style={styles.innerInput}
+                    value={paymentSettings.paypalSecret}
+                    onChangeText={(val) => setPaymentSettings({...paymentSettings, paypalSecret: val})}
+                    placeholder="Enter PayPal Secret Key..."
+                    placeholderTextColor="#333"
+                    secureTextEntry
+                  />
+                </>
+              ) : paymentSettings.activeGateway === 'Manual' ? (
+                <>
+                  <Text style={styles.innerLabel}>Broker Wallet Address (USDT)</Text>
+                  <TextInput
+                    style={[styles.innerInput, { marginBottom: 15 }]}
+                    value={paymentSettings.manualCryptoAddress}
+                    onChangeText={(val) => setPaymentSettings({...paymentSettings, manualCryptoAddress: val})}
+                    placeholder="e.g. TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+                    placeholderTextColor="#333"
+                  />
+                  <Text style={styles.innerLabel}>Network</Text>
+                  <TextInput
+                    style={styles.innerInput}
+                    value={paymentSettings.manualCryptoNetwork}
+                    onChangeText={(val) => setPaymentSettings({...paymentSettings, manualCryptoNetwork: val})}
+                    placeholder="e.g. TRC20"
+                    placeholderTextColor="#333"
+                  />
+                  <Text style={[styles.helperText, { marginTop: 10, color: '#FFD400' }]}>
+                    Clients will see this address to send payment. You must verify the transaction manually to confirm bookings.
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.innerLabel}>{paymentSettings.activeGateway} Secret Key</Text>
+                  <TextInput
+                    style={styles.innerInput}
+                    value={
+                      paymentSettings.activeGateway === 'Stripe' ? paymentSettings.stripeKey :
+                      paymentSettings.activeGateway === 'Tap' ? paymentSettings.tapKey :
+                      paymentSettings.nowPaymentsKey
+                    }
+                    onChangeText={(val) => {
+                      const key = paymentSettings.activeGateway === 'Stripe' ? 'stripeKey' :
+                                  paymentSettings.activeGateway === 'Tap' ? 'tapKey' : 'nowPaymentsKey';
+                      updatePaymentDetail(key, val);
+                    }}
+                    placeholder={`Enter your ${paymentSettings.activeGateway} key...`}
+                    placeholderTextColor="#333"
+                    secureTextEntry
+                  />
+                </>
+              )}
+              
+              <View style={styles.divider} />
+              <Text style={styles.innerLabel}>Supported Payment Methods</Text>
+              <View style={styles.methodsRow}>
+                {Object.entries(paymentSettings.enabledMethods).map(([method, enabled]) => (
+                  <TouchableOpacity 
+                    key={method} 
+                    style={[styles.methodChip, enabled && styles.activeMethodChip]}
+                    onPress={() => setPaymentSettings({
+                      ...paymentSettings, 
+                      enabledMethods: { ...paymentSettings.enabledMethods, [method]: !enabled }
+                    })}
+                  >
+                    <Text style={[styles.methodText, enabled && styles.activeMethodText]}>
+                      {method === 'card' ? '💳 Credit Card' : 
+                       method === 'paypal' ? '🅿️ PayPal' : 
+                       method === 'applePay' ? '🍎 Apple Pay' : 
+                       method === 'googlePay' ? '🤖 Google Pay' : '₿ Crypto'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.helperText}>
+                All payments will be routed through this gateway to your Alkhudari Group bank account or wallet.
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Security Certificates Section */}
         <View style={styles.card}>
           {apiSettings.certificates?.length > 0 ? (
             apiSettings.certificates.map(cert => (
@@ -346,6 +505,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  typeSelector: {
+    flexDirection: 'row',
+    backgroundColor: '#111',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+  },
+  typeBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  activeTypeBtn: {
+    backgroundColor: '#FFD400',
+  },
+  typeBtnText: {
+    color: '#888',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  activeTypeBtnText: {
+    color: '#000',
+  },
+  methodsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 10,
+  },
+  methodChip: {
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#222',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  activeMethodChip: {
+    borderColor: '#FFD400',
+    backgroundColor: '#FFD40010',
+  },
+  methodText: {
+    color: '#666',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  activeMethodText: {
+    color: '#FFD400',
+  },
   percentBadge: {
     backgroundColor: '#FFD40020',
     paddingHorizontal: 15,
@@ -496,28 +705,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     marginBottom: 20,
-  },
-  typeSelector: {
-    flexDirection: 'row',
-    marginBottom: 20,
-    gap: 10,
-  },
-  typeBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 8,
-    backgroundColor: '#222',
-  },
-  activeTypeBtn: {
-    backgroundColor: '#FFD400',
-  },
-  typeBtnText: {
-    color: '#888',
-    fontWeight: '700',
-  },
-  activeTypeBtnText: {
-    color: '#000',
   },
   modalInputGroup: {
     marginBottom: 20,

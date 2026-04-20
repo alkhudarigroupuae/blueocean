@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Activ
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store';
+import { getImperialAnalytics } from '../../services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -11,21 +12,37 @@ export default function TrafficAnalytics() {
   const { apiSettings } = useStore();
   const [loading, setLoading] = useState(true);
   
-  // Simulation of real data from RapidAPI Analytics
   const [stats, setStats] = useState({
-    totalCalls: 1250,
-    errorRate: 0.5,
-    latency: 145,
+    totalCalls: 0,
+    errorRate: 0,
+    latency: 0,
+    trafficData: [0, 0, 0, 0, 0, 0, 0]
   });
 
+  const [activeFilter, setActiveTab] = useState('7d');
+
   useEffect(() => {
-    // Here we would call the RapidAPI Platform API using the Master Key
-    // To get real traffic metrics for your Alkhudari Group Hub
-    setTimeout(() => setLoading(false), 1500);
-  }, []);
+    const loadAnalytics = async () => {
+      setLoading(true);
+      try {
+        const data = await getImperialAnalytics(activeFilter);
+        setStats({
+          totalCalls: data.totalCalls,
+          errorRate: data.errorRate,
+          latency: data.latency,
+          trafficData: data.trafficData
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAnalytics();
+  }, [activeFilter]);
 
   const timeFilters = ['1h', '3h', '12h', '24h', '7d', '30d', '90d'];
-  const [activeFilter, setActiveTab] = useState('7d');
 
   return (
     <View style={styles.container}>
@@ -97,7 +114,7 @@ export default function TrafficAnalytics() {
                
                {/* Animated-like Bar bars for visual parity with your image */}
                <View style={styles.barsContainer}>
-                  {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
+                  {stats.trafficData.map((h, i) => (
                     <View key={i} style={styles.barGroup}>
                        <View style={[styles.bar, { height: `${h}%`, backgroundColor: '#22C55E' }]} />
                        <View style={[styles.bar, { height: `${h/10}%`, backgroundColor: '#EF4444' }]} />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, Image, Alert, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Header, Button } from '../../components/Header';
 import { useStore } from '../../store';
 import { sampleDestinations } from '../../services/api';
@@ -9,8 +10,14 @@ import { Colors, PaymentInfo } from '../../types';
 export default function BookingScreen() {
   const router = useRouter();
   const { id, provider, price } = useLocalSearchParams();
-  const { addBooking } = useStore();
+  const { addBooking, apiSettings } = useStore();
   const destination = sampleDestinations.find(d => d.id === id);
+
+  const { paymentGateways } = apiSettings;
+  const [selectedMethod, setSelectedMethod] = useState<'card' | 'paypal' | 'applePay' | 'googlePay' | 'crypto'>(
+    paymentGateways.activeGateway === 'PayPal' ? 'paypal' : 
+    paymentGateways.activeGateway === 'Manual' ? 'crypto' : 'card'
+  );
 
   const [guests, setGuests] = useState(2);
   const selectedPrice = price ? parseInt(price as string) : (destination?.price || 0);
@@ -152,54 +159,142 @@ export default function BookingScreen() {
         {/* Payment Information */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment Details</Text>
-          <Text style={styles.sectionSubtitle}>Your payment is secured by Blue Ocean</Text>
+          <Text style={styles.sectionSubtitle}>
+            Your payment is secured by {apiSettings.branding.companyName}
+          </Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Card Number</Text>
-            <TextInput
-              style={styles.input}
-              value={paymentInfo.cardNumber}
-              onChangeText={(text) => setPaymentInfo({ ...paymentInfo, cardNumber: text })}
-              placeholder="1234 5678 9012 3456"
-              keyboardType="numeric"
-              maxLength={19}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Cardholder Name</Text>
-            <TextInput
-              style={styles.input}
-              value={paymentInfo.cardHolder}
-              onChangeText={(text) => setPaymentInfo({ ...paymentInfo, cardHolder: text })}
-              placeholder="JOHN DOE"
-            />
-          </View>
-
-          <View style={styles.row}>
-            <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
-              <Text style={styles.inputLabel}>Expiry Date</Text>
-              <TextInput
-                style={styles.input}
-                value={paymentInfo.expiryDate}
-                onChangeText={(text) => setPaymentInfo({ ...paymentInfo, expiryDate: text })}
-                placeholder="MM/YY"
-                maxLength={5}
-              />
+          {(paymentGateways.activeGateway === 'PayPal' || paymentGateways.activeGateway === 'Manual') && (
+            <View style={styles.unifiedMethodsRow}>
+              {paymentGateways.enabledMethods.card && (
+                <TouchableOpacity 
+                  style={[styles.methodBtn, selectedMethod === 'card' && styles.activeMethodBtn]} 
+                  onPress={() => setSelectedMethod('card')}
+                >
+                  <Ionicons 
+                    name="card-outline" 
+                    size={24} 
+                    color={selectedMethod === 'card' ? Colors.primary : Colors.textLight} 
+                  />
+                  <Text style={[styles.methodLabel, selectedMethod === 'card' && styles.activeMethodLabel]}>Card</Text>
+                </TouchableOpacity>
+              )}
+              {paymentGateways.enabledMethods.paypal && (
+                <TouchableOpacity 
+                  style={[styles.methodBtn, selectedMethod === 'paypal' && styles.activeMethodBtn]} 
+                  onPress={() => setSelectedMethod('paypal')}
+                >
+                  <Ionicons 
+                    name="logo-paypal" 
+                    size={24} 
+                    color={selectedMethod === 'paypal' ? '#003087' : Colors.textLight} 
+                  />
+                  <Text style={[styles.methodLabel, selectedMethod === 'paypal' && styles.activeMethodLabel]}>PayPal</Text>
+                </TouchableOpacity>
+              )}
+              {paymentGateways.enabledMethods.crypto && (
+                <TouchableOpacity 
+                  style={[styles.methodBtn, selectedMethod === 'crypto' && styles.activeMethodBtn]} 
+                  onPress={() => setSelectedMethod('crypto')}
+                >
+                  <Ionicons 
+                    name="logo-bitcoin" 
+                    size={24} 
+                    color={selectedMethod === 'crypto' ? '#F7931A' : Colors.textLight} 
+                  />
+                  <Text style={[styles.methodLabel, selectedMethod === 'crypto' && styles.activeMethodLabel]}>Crypto</Text>
+                </TouchableOpacity>
+              )}
+              {paymentGateways.enabledMethods.applePay && (
+                <TouchableOpacity 
+                  style={[styles.methodBtn, selectedMethod === 'applePay' && styles.activeMethodBtn]} 
+                  onPress={() => setSelectedMethod('applePay')}
+                >
+                  <Ionicons 
+                    name="logo-apple" 
+                    size={24} 
+                    color={selectedMethod === 'applePay' ? '#000000' : Colors.textLight} 
+                  />
+                  <Text style={[styles.methodLabel, selectedMethod === 'applePay' && styles.activeMethodLabel]}>Apple</Text>
+                </TouchableOpacity>
+              )}
             </View>
-            <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.inputLabel}>CVV</Text>
-              <TextInput
-                style={styles.input}
-                value={paymentInfo.cvv}
-                onChangeText={(text) => setPaymentInfo({ ...paymentInfo, cvv: text })}
-                placeholder="123"
-                keyboardType="numeric"
-                maxLength={4}
-                secureTextEntry
-              />
+          )}
+
+          {selectedMethod === 'card' ? (
+            <>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Card Number</Text>
+                <TextInput
+                  style={styles.input}
+                  value={paymentInfo.cardNumber}
+                  onChangeText={(text) => setPaymentInfo({ ...paymentInfo, cardNumber: text })}
+                  placeholder="1234 5678 9012 3456"
+                  keyboardType="numeric"
+                  maxLength={19}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Cardholder Name</Text>
+                <TextInput
+                  style={styles.input}
+                  value={paymentInfo.cardHolder}
+                  onChangeText={(text) => setPaymentInfo({ ...paymentInfo, cardHolder: text })}
+                  placeholder="JOHN DOE"
+                />
+              </View>
+
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
+                  <Text style={styles.inputLabel}>Expiry Date</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={paymentInfo.expiryDate}
+                    onChangeText={(text) => setPaymentInfo({ ...paymentInfo, expiryDate: text })}
+                    placeholder="MM/YY"
+                    maxLength={5}
+                  />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.inputLabel}>CVV</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={paymentInfo.cvv}
+                    onChangeText={(text) => setPaymentInfo({ ...paymentInfo, cvv: text })}
+                    placeholder="123"
+                    keyboardType="numeric"
+                    maxLength={4}
+                    secureTextEntry
+                  />
+                </View>
+              </View>
+            </>
+          ) : selectedMethod === 'crypto' ? (
+            <View style={styles.alternativePaymentBox}>
+              <Ionicons name="wallet-outline" size={48} color="#F7931A" />
+              <Text style={styles.alternativePaymentText}>
+                Please send exactly <Text style={{ fontWeight: '800' }}>${totalPrice + Math.round(totalPrice * 0.1)} USDT</Text> to the address below:
+              </Text>
+              <View style={styles.addressBox}>
+                 <Text style={styles.addressText}>{paymentGateways.manualCryptoAddress || 'NO_ADDRESS_CONFIGURED'}</Text>
+                 <Text style={styles.networkText}>Network: {paymentGateways.manualCryptoNetwork}</Text>
+              </View>
+              <Text style={styles.helperTextMini}>
+                Your booking will be confirmed manually after the transaction is verified on the blockchain.
+              </Text>
             </View>
-          </View>
+          ) : (
+            <View style={styles.alternativePaymentBox}>
+              <Ionicons 
+                name={selectedMethod === 'paypal' ? 'logo-paypal' : selectedMethod === 'applePay' ? 'logo-apple' : 'logo-google'} 
+                size={48} 
+                color={selectedMethod === 'paypal' ? '#003087' : selectedMethod === 'applePay' ? '#000' : '#4285F4'} 
+              />
+              <Text style={styles.alternativePaymentText}>
+                You will be redirected to {selectedMethod === 'paypal' ? 'PayPal' : selectedMethod === 'applePay' ? 'Apple Pay' : 'Google Pay'} to complete your payment securely.
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Secure Payment Badge */}
@@ -266,7 +361,86 @@ const styles = StyleSheet.create({
   summaryDuration: {
     fontSize: 12,
     color: Colors.textMuted,
-    marginTop: 8,
+    marginTop: 4,
+  },
+  unifiedMethodsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 20,
+  },
+  methodBtn: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeMethodBtn: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '05',
+  },
+  methodIcon: {
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  methodLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: Colors.textLight,
+  },
+  activeMethodLabel: {
+    color: Colors.primary,
+  },
+  alternativePaymentBox: {
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  alternativePaymentIcon: {
+    fontSize: 40,
+    marginBottom: 16,
+  },
+  alternativePaymentText: {
+    fontSize: 14,
+    color: Colors.text,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  addressBox: {
+    backgroundColor: '#F3F4F6',
+    padding: 12,
+    borderRadius: 12,
+    width: '100%',
+    marginVertical: 15,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  addressText: {
+    fontSize: 12,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    color: '#374151',
+    textAlign: 'center',
+    fontWeight: '700',
+  },
+  networkText: {
+    fontSize: 10,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  helperTextMini: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   section: {
     backgroundColor: Colors.white,

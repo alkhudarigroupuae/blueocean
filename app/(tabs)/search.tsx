@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Modal } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Modal, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, SearchBar } from '../../components/Header';
@@ -9,10 +9,11 @@ import { Colors, Destination } from '../../types';
 
 export default function SearchScreen() {
   const router = useRouter();
-  const { searchQuery, setSearchQuery, theme } = useStore();
+  const { searchQuery, setSearchQuery, theme, apiSettings } = useStore();
   const [results, setResults] = useState<Destination[]>(sampleDestinations);
   const [sortBy, setSortBy] = useState<'low' | 'high'>('low');
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [suggestions, setSuggestions] = useState<Destination[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   
@@ -54,38 +55,45 @@ export default function SearchScreen() {
     router.push(`/destination/${destination.id}`);
   };
 
-  useEffect(() => {
-    const fetchResults = async () => {
-      setIsLoading(true);
-      try {
-        let data;
-        if (searchQuery.length > 0) {
-          data = await searchFlights('DXB', searchQuery);
-        } else {
-          data = sampleDestinations;
-        }
+  const fetchResults = async (isRefreshing = false) => {
+    if (isRefreshing) setRefreshing(true);
+    else setIsLoading(true);
 
-        // Apply Advanced Filters
-        let filtered = data.filter(item => {
-          const matchesPrice = item.price >= priceRange[0] && item.price <= priceRange[1];
-          const matchesRating = !selectedRating || item.rating >= selectedRating;
-          return matchesPrice && matchesRating;
-        });
-
-        // Sort logic
-        const sorted = [...filtered].sort((a, b) => {
-          return sortBy === 'low' ? a.price - b.price : (b.highestPrice || b.price) - (a.highestPrice || a.price);
-        });
-
-        setResults(sorted);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+    try {
+      let data;
+      if (searchQuery.length > 0) {
+        data = await searchFlights('DXB', searchQuery, apiSettings.branding.companyName);
+      } else {
+        data = sampleDestinations;
       }
-    };
 
+      // Apply Advanced Filters
+      let filtered = data.filter(item => {
+        const matchesPrice = item.price >= priceRange[0] && item.price <= priceRange[1];
+        const matchesRating = !selectedRating || item.rating >= selectedRating;
+        return matchesPrice && matchesRating;
+      });
+
+      // Sort logic
+      const sorted = [...filtered].sort((a, b) => {
+        return sortBy === 'low' ? a.price - b.price : (b.highestPrice || b.price) - (a.highestPrice || a.price);
+      });
+
+      setResults(sorted);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     fetchResults();
+  }, [searchQuery, sortBy, priceRange, selectedRating]);
+
+  const onRefresh = React.useCallback(() => {
+    fetchResults(true);
   }, [searchQuery, sortBy, priceRange, selectedRating]);
 
   const handleDestinationPress = (id: string) => {
@@ -257,8 +265,17 @@ export default function SearchScreen() {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshing={isLoading}
-        onRefresh={() => setSearchQuery(searchQuery)}
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={10}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor={Colors.primary}
+            colors={[Colors.primary]} 
+          />
+        }
         ListEmptyComponent={
           isLoading ? (
             <View style={styles.empty}>

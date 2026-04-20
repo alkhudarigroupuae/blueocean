@@ -8,31 +8,27 @@ const { width } = Dimensions.get('window');
 
 export default function AdminBilling() {
   const router = useRouter();
-  const { apiSettings } = useStore();
+  const { apiSettings, bookings } = useStore();
   
-  const [activeFilter, setActiveFilter] = useState('Subscribed');
+  const [activeTab, setActiveTab] = useState('Transactions History');
 
-  const renderHeader = () => (
+  const renderTableHeader = () => (
     <View style={styles.tableHeader}>
-      <Text style={[styles.headerCell, { flex: 2 }]}>API Name</Text>
-      <Text style={[styles.headerCell, { flex: 1.5 }]}>Plan</Text>
-      <Text style={[styles.headerCell, { flex: 1 }]}>Status</Text>
-      <Text style={[styles.headerCell, { flex: 2 }]}>Date Subscribed</Text>
-      <Text style={[styles.headerCell, { flex: 1 }]}>Quota</Text>
+      <Text style={[styles.headerCell, { flex: 2 }]}>Destination</Text>
+      <Text style={[styles.headerCell, { flex: 1.5 }]}>Revenue</Text>
+      <Text style={[styles.headerCell, { flex: 1 }]}>Profit (15%)</Text>
+      <Text style={[styles.headerCell, { flex: 2 }]}>Date</Text>
+      <Text style={[styles.headerCell, { flex: 1.5 }]}>Confirmation</Text>
     </View>
   );
 
-  const renderRow = ({ item }: { item: any }) => (
+  const renderBookingRow = ({ item }: { item: any }) => (
     <View style={styles.tableRow}>
-      <Text style={[styles.cell, { flex: 2, fontWeight: '700' }]}>{item.apiName}</Text>
-      <Text style={[styles.cell, { flex: 1.5, color: '#666' }]}>{item.plan}</Text>
-      <View style={{ flex: 1 }}>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
-      </View>
-      <Text style={[styles.cell, { flex: 2, color: '#666' }]}>{item.dateSubscribed}</Text>
-      <Text style={[styles.cell, { flex: 1, fontWeight: '600' }]}>{item.quotaUsage}</Text>
+      <Text style={[styles.cell, { flex: 2, fontWeight: '700' }]}>{item.destinationName}</Text>
+      <Text style={[styles.cell, { flex: 1.5, color: '#166534', fontWeight: '700' }]}>${item.totalPrice.toFixed(2)}</Text>
+      <Text style={[styles.cell, { flex: 1, color: '#2563EB', fontWeight: '700' }]}>${(item.totalPrice * 0.15).toFixed(2)}</Text>
+      <Text style={[styles.cell, { flex: 2, color: '#666' }]}>{item.createdAt}</Text>
+      <Text style={[styles.cell, { flex: 1.5, fontWeight: '600', fontFamily: 'monospace' }]}>{item.confirmationCode}</Text>
     </View>
   );
 
@@ -44,60 +40,59 @@ export default function AdminBilling() {
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="#374151" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Billing</Text>
+          <Text style={styles.headerTitle}>Broker Billing</Text>
           <View style={{ width: 24 }} />
         </View>
         
         <View style={styles.tabContainer}>
-          <Text style={styles.tab}>Billing information</Text>
-          <Text style={[styles.tab, styles.activeTab]}>Subscriptions & Usage</Text>
-          <Text style={styles.tab}>Transactions History</Text>
+          <TouchableOpacity onPress={() => setActiveTab('Billing information')}>
+            <Text style={[styles.tab, activeTab === 'Billing information' && styles.activeTab]}>Billing information</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setActiveTab('Subscriptions & Usage')}>
+            <Text style={[styles.tab, activeTab === 'Subscriptions & Usage' && styles.activeTab]}>Subscriptions & Usage</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setActiveTab('Transactions History')}>
+            <Text style={[styles.tab, activeTab === 'Transactions History' && styles.activeTab]}>Transactions History</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} horizontal={false}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Subscriptions and Usage</Text>
-          <Text style={styles.sectionSubtitle}>Monitor API subscription and quota usage of your subscribed APIs.</Text>
-        </View>
+        {activeTab === 'Transactions History' ? (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Real Transaction Log</Text>
+              <Text style={styles.sectionSubtitle}>Every booking made by your clients, with your 15% markup calculated automatically.</Text>
+            </View>
 
-        {/* Filter Row like in the image */}
-        <View style={styles.filterRow}>
-          <View style={styles.checkboxContainer}>
-            <TouchableOpacity 
-              style={[styles.checkbox, activeFilter === 'Subscribed' && styles.checkboxActive]}
-              onPress={() => setActiveFilter('Subscribed')}
-            >
-              {activeFilter === 'Subscribed' && <Text style={styles.checkmark}>✓</Text>}
-            </TouchableOpacity>
-            <Text style={styles.filterLabel}>Subscribed</Text>
-            
-            <TouchableOpacity 
-              style={[styles.checkbox, activeFilter === 'Unsubscribed' && styles.checkboxActive, { marginLeft: 20 }]}
-              onPress={() => setActiveFilter('Unsubscribed')}
-            >
-              {activeFilter === 'Unsubscribed' && <Text style={styles.checkmark}>✓</Text>}
-            </TouchableOpacity>
-            <Text style={styles.filterLabel}>Unsubscribed</Text>
+            {/* The Table */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+              <View style={styles.tableContainer}>
+                {renderTableHeader()}
+                {bookings.length > 0 ? (
+                  <FlatList
+                    data={bookings}
+                    renderItem={renderBookingRow}
+                    keyExtractor={item => item.id}
+                    scrollEnabled={false}
+                  />
+                ) : (
+                  <View style={styles.emptyBox}>
+                     <Text style={styles.emptyText}>No transactions recorded yet.</Text>
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+          </>
+        ) : (
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyText}>Section: {activeTab} coming soon.</Text>
           </View>
-        </View>
-
-        {/* The Table */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-          <View style={styles.tableContainer}>
-            {renderHeader()}
-            <FlatList
-              data={apiSettings.subscriptions}
-              renderItem={renderRow}
-              keyExtractor={item => item.id}
-              scrollEnabled={false}
-            />
-          </View>
-        </ScrollView>
+        )}
         
         <View style={styles.footer}>
-           <Text style={styles.footerText}>Imperial Billing Sync: Active</Text>
-           <Text style={styles.idText}>Master ID: {apiSettings.subscriptions[0]?.id}</Text>
+           <Text style={styles.footerText}>Imperial Profit Engine: ACTIVE</Text>
+           <Text style={styles.idText}>Connected to {apiSettings.branding.companyName}</Text>
         </View>
       </ScrollView>
     </View>
@@ -239,6 +234,16 @@ const styles = StyleSheet.create({
     color: '#166534',
     fontSize: 11,
     fontWeight: '700',
+  },
+  emptyBox: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    color: '#6B7280',
+    fontSize: 14,
+    fontStyle: 'italic',
   },
   footer: {
     marginTop: 40,

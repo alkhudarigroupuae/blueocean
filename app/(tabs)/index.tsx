@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, ActivityIndicator, Animated, RefreshControl } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import Head from 'expo-router/head';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,11 +15,31 @@ const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { destinations, setDestinations, searchQuery, setSearchQuery, theme } = useStore();
+  const { destinations, setDestinations, searchQuery, setSearchQuery, theme, news, apiSettings } = useStore();
   const [featured, setFeatured] = useState<Destination[]>([]);
   const [popular, setPopular] = useState<Destination[]>([]);
+  
+  // Animation for Quick Actions
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
   const [newsIndex, setNewsIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const isDark = theme === 'dark';
   const dynamicStyles = {
@@ -39,20 +59,41 @@ export default function HomeScreen() {
     { title: 'Tokyo Tech Expo', subtitle: 'Explore the future of travel tech', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80' },
     { title: 'Maldives Marine Life', subtitle: 'Snorkeling with whale sharks guide', image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80' },
     { title: 'London Culture Week', subtitle: 'Museums opening late this month', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80' },
-    { title: 'Paris Fashion Escape', subtitle: 'Luxury hotel stays during fashion week', image: 'https://images.unsplash.com/photo-1502602898657-3e917247a184?w=800&q=80' },
+    { title: 'Paris Luxury Getaway', subtitle: 'Luxury hotel stays during fashion week', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800&q=80' },
   ];
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNewsIndex((prev) => (prev + 1) % travelNews.length);
-    }, 4000);
-    return () => clearInterval(timer);
+  const loadRealData = async () => {
+    try {
+      const realData = await getFeaturedDestinations();
+      setFeatured(realData.slice(0, 5));
+      setPopular(realData.slice(5, 10));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    loadRealData();
   }, []);
+
+  useEffect(() => {
+    if (news && news.length > 0) {
+      const timer = setInterval(() => {
+        setNewsIndex((prev) => (prev + 1) % news.length);
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [news]);
 
   useEffect(() => {
     const loadRealData = async () => {
       setLoading(true);
       try {
+        const brandingName = apiSettings.branding.companyName;
         const realData = await getFeaturedDestinations();
         setFeatured(realData.slice(0, 5));
         setPopular(realData.slice(5, 10));
@@ -63,7 +104,7 @@ export default function HomeScreen() {
       }
     };
     loadRealData();
-  }, []);
+  }, [apiSettings.branding.companyName]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Destination[]>([]);
@@ -135,40 +176,100 @@ export default function HomeScreen() {
         </View>
       )}
       
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero News Carousel */}
-        <View style={styles.hero}>
-          <Image 
-            source={{ uri: travelNews[newsIndex].image }} 
-            style={StyleSheet.absoluteFill} 
-            resizeMode="cover"
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh} 
+            tintColor={Colors.primary}
+            colors={[Colors.primary]} 
           />
-          {/* Enhanced Overlay with Gradient-like shadow */}
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
-          <View style={[StyleSheet.absoluteFill, { 
-            backgroundColor: 'transparent',
-            borderBottomWidth: 100,
-            borderBottomColor: 'rgba(0,0,0,0.8)',
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 100,
-          }]} />
-          
-          <View style={styles.heroTextContainer}>
-            <Text style={styles.heroTitle}>{travelNews[newsIndex].title}</Text>
-            <Text style={styles.heroTitleAccent}>{travelNews[newsIndex].subtitle}</Text>
-            <Text style={styles.heroSubtitle}>Exclusive Imperial Packages by Blue Ocean</Text>
-          </View>
-          
-          <View style={styles.carouselDots}>
-            {travelNews.map((_, i) => (
-              <View 
-                key={i} 
-                style={[styles.dot, newsIndex === i && styles.activeDot]} 
+        }
+      >
+        <ScrollView 
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={(e) => {
+            const index = Math.round(e.nativeEvent.contentOffset.x / width);
+            setNewsIndex(index);
+          }}
+          style={styles.newsCarousel}
+        >
+          {news.map((item, index) => (
+            <TouchableOpacity 
+              key={item.id} 
+              activeOpacity={0.9}
+              style={[styles.hero, { width }]}
+            >
+              <Image 
+                source={{ uri: item.image }} 
+                style={StyleSheet.absoluteFill} 
+                resizeMode="cover"
               />
-            ))}
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
+              
+              <View style={styles.heroTextContainer}>
+                <Text style={styles.heroTitle}>{item.title}</Text>
+                <Text style={styles.heroTitleAccent}>{item.subtitle}</Text>
+                <Text style={styles.heroSubtitle}>Exclusive Imperial News by {apiSettings.branding.companyName}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        
+        <View style={styles.carouselDots}>
+          {news.map((_, i) => (
+            <View 
+              key={i} 
+              style={[styles.dot, newsIndex === i && styles.activeDot]} 
+            />
+          ))}
+        </View>
+
+        {/* Quick Actions moved over Featured Destinations */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { paddingHorizontal: 20, marginBottom: 12 }]}>Quick Actions</Text>
+          <View style={[styles.actionGrid, { paddingHorizontal: 20 }]}>
+            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                onPress={() => router.push('/search')}
+              >
+                <Ionicons name="airplane" size={24} color={Colors.primary} style={styles.actionIconIonic} />
+                <Text style={[styles.actionText, dynamicStyles.text]}>Flights</Text>
+              </TouchableOpacity>
+            </Animated.View>
+            
+            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginHorizontal: 10 }}>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                onPress={() => router.push('/search')}
+              >
+                <Ionicons name="business" size={24} color={Colors.primary} style={styles.actionIconIonic} />
+                <Text style={[styles.actionText, dynamicStyles.text]}>Hotels</Text>
+              </TouchableOpacity>
+            </Animated.View>
+
+            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                onPress={() => router.push('/search')}
+              >
+                <Ionicons name="map" size={24} color={Colors.primary} style={styles.actionIconIonic} />
+                <Text style={[styles.actionText, dynamicStyles.text]}>Packages</Text>
+              </TouchableOpacity>
+            </Animated.View>
           </View>
         </View>
 
@@ -176,7 +277,9 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Featured Destinations</Text>
-            <Text style={styles.seeAll}>See All →</Text>
+            <TouchableOpacity onPress={() => router.push('/search')}>
+              <Text style={styles.seeAll}>See All →</Text>
+            </TouchableOpacity>
           </View>
           {loading ? (
             <ActivityIndicator size="small" color={Colors.primary} style={{ marginVertical: 20 }} />
@@ -186,6 +289,8 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item) => item.id}
+              snapToInterval={width * 0.8 + 20}
+              decelerationRate="fast"
               renderItem={({ item }) => (
                 <DestinationCard
                   destination={item}
@@ -201,7 +306,9 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Popular Packages</Text>
-            <Text style={styles.seeAll}>See All →</Text>
+            <TouchableOpacity onPress={() => router.push('/search')}>
+              <Text style={styles.seeAll}>See All →</Text>
+            </TouchableOpacity>
           </View>
           {loading ? (
             <ActivityIndicator size="small" color={Colors.primary} style={{ marginVertical: 20 }} />
@@ -211,6 +318,8 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item) => item.id}
+              snapToInterval={width * 0.8 + 20}
+              decelerationRate="fast"
               renderItem={({ item }) => (
                 <DestinationCard
                   destination={item}
@@ -224,50 +333,34 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Latest Travel Insights</Text>
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Imperial Travel Insights</Text>
             <TouchableOpacity onPress={() => router.push('/blog')}>
-              <Text style={styles.seeAll}>Read Blog →</Text>
+              <Text style={styles.seeAll}>Full Blog →</Text>
             </TouchableOpacity>
           </View>
-          <FlatList
-            data={travelNews.slice(0, 3)}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity 
-                style={[styles.newsCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFF', borderColor: isDark ? '#1A1A1A' : '#EEE' }]}
-                onPress={() => router.push('/blog')}
-              >
-                <Image source={{ uri: item.image }} style={styles.newsCardImage} />
-                <View style={styles.newsCardContent}>
-                  <Text style={[styles.newsCardTitle, dynamicStyles.text]} numberOfLines={1}>{item.title}</Text>
-                  <Text style={[styles.newsCardSub, dynamicStyles.subText]} numberOfLines={1}>{item.subtitle}</Text>
-                </View>
-              </TouchableOpacity>
+          
+          <View style={styles.verticalNewsList}>
+            {news && news.length > 0 ? (
+              news.slice(0, 5).map((item) => (
+                <TouchableOpacity 
+                  key={item.id} 
+                  style={[styles.newsRow, { backgroundColor: isDark ? '#0A0A0A' : '#FFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]}
+                  onPress={() => router.push('/blog')}
+                >
+                  <Image source={{ uri: item.image }} style={styles.newsRowImage} />
+                  <View style={styles.newsRowContent}>
+                    <Text style={[styles.newsRowTitle, dynamicStyles.text]} numberOfLines={2}>{item.title}</Text>
+                    <Text style={[styles.newsRowTime, dynamicStyles.subText]} numberOfLines={1}>{item.subtitle}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color={isDark ? '#444' : '#CCC'} />
+                </TouchableOpacity>
+              ))
+            ) : (
+              <Text style={[styles.emptyNews, dynamicStyles.subText]}>No news available.</Text>
             )}
-            contentContainerStyle={styles.cardList}
-          />
+          </View>
         </View>
 
-        {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Quick Actions</Text>
-          <View style={styles.actionGrid}>
-            <TouchableOpacity style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} onPress={() => router.push('/search')}>
-              <Ionicons name="airplane" size={24} color={Colors.primary} style={styles.actionIconIonic} />
-              <Text style={[styles.actionText, dynamicStyles.text]}>Flights</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} onPress={() => router.push('/search')}>
-              <Ionicons name="business" size={24} color={Colors.primary} style={styles.actionIconIonic} />
-              <Text style={[styles.actionText, dynamicStyles.text]}>Hotels</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} onPress={() => router.push('/search')}>
-              <Ionicons name="map" size={24} color={Colors.primary} style={styles.actionIconIonic} />
-              <Text style={[styles.actionText, dynamicStyles.text]}>Packages</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
         <View style={styles.bottomPadding} />
       </ScrollView>
     </View>
@@ -299,9 +392,12 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 28,
     marginBottom: 24,
-    height: 200,
+    height: 250,
     overflow: 'hidden',
     justifyContent: 'center',
+  },
+  newsCarousel: {
+    height: 250,
   },
   carouselDots: {
     flexDirection: 'row',
@@ -401,14 +497,19 @@ const styles = StyleSheet.create({
   actionGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
   },
   actionCard: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 15,
     alignItems: 'center',
+    paddingVertical: 16,
+    borderRadius: 16,
     borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    transform: [{ scale: 1 }],
   },
   actionIcon: {
     fontSize: 24,
@@ -442,6 +543,39 @@ const styles = StyleSheet.create({
   },
   newsCardSub: {
     fontSize: 11,
+  },
+  verticalNewsList: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  newsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  newsRowTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  newsRowTime: {
+    fontSize: 12,
+  },
+  newsRowImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+    marginRight: 15,
+  },
+  newsRowContent: {
+    flex: 1,
+  },
+  emptyNews: {
+    textAlign: 'center',
+    padding: 20,
+    fontStyle: 'italic',
   },
   bottomPadding: {
     height: 100,

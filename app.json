@@ -28,7 +28,18 @@
     },
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "description": "Enterprise Travel & Brokerage Platform by Alkhudari Group",
+      "shortName": "BlueOcean",
+      "themeColor": "#0066CC",
+      "backgroundColor": "#0066CC",
+      "display": "standalone",
+      "orientation": "portrait",
+      "splash": {
+        "image": "./assets/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#0066CC"
+      }
     },
     "plugins": [
       "expo-router",

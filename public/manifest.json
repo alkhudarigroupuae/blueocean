@@ -1,0 +1,20 @@
+{
+  "short_name": "BlueOcean",
+  "name": "Blue Ocean Enterprise Travel",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0066CC",
+  "background_color": "#0066CC"
+}

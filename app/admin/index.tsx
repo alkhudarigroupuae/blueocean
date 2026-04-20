@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList, Modal, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store';
@@ -17,8 +17,45 @@ const ShadcnCard = ({ children, style }: { children: React.ReactNode, style?: an
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { theme, setTheme } = useStore();
+  const { theme, setTheme, updateApiSettings, bookings } = useStore();
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
+  
+  // Calculate Profit from Bookings
+  const totalRevenue = bookings.reduce((sum, b) => sum + b.totalPrice, 0);
+  const totalProfit = bookings.reduce((sum, b) => sum + (b.totalPrice * 0.15), 0); // 15% markup
+  
+  // Registration States
+  const [newCompanyName, setNewCompanyName] = useState('');
+  const [newCompanyDomain, setNewCompanyDomain] = useState('');
+  const [newApiKey, setNewApiKey] = useState('');
+
+  const handleRegisterCompany = () => {
+    if (!newCompanyName || !newApiKey) {
+      Alert.alert('Incomplete Data', 'Imperial system requires at least a company name and a master API key.');
+      return;
+    }
+
+    // In a real SaaS, this would create a new tenant. 
+    // Here we update the current branding to simulate "onboarding" the first company.
+    updateApiSettings({
+      branding: {
+        logoType: 'Hybrid',
+        primaryColor: '#0066CC',
+        companyName: newCompanyName,
+        tagline: `Powered by Alkhudari Group | ${newCompanyDomain}`,
+      },
+      providers: {
+        'Booking.com': { apiKey: newApiKey, apiHost: 'booking-com15.p.rapidapi.com', enabled: true },
+        'Skyscanner': { apiKey: newApiKey, apiHost: 'skyscanner44.p.rapidapi.com', enabled: true },
+        'TripAdvisor': { apiKey: newApiKey, apiHost: 'tripadvisor16.p.rapidapi.com', enabled: false },
+        'Google Flights': { apiKey: newApiKey, apiHost: 'google-flights12.p.rapidapi.com', enabled: false },
+      }
+    });
+
+    Alert.alert('Imperial Handshake Success', `${newCompanyName} has been registered and deployed on the cluster.`);
+    setIsRegisterModalVisible(false);
+  };
 
   const isDark = theme === 'dark';
   const dynamicStyles = {
@@ -34,8 +71,9 @@ export default function AdminDashboard() {
 
   const sidebarItems = [
     { name: 'Dashboard', icon: 'grid', route: '/admin' },
+    { name: 'Orders', icon: 'cart', route: '/admin' },
+    { name: 'News', icon: 'newspaper', route: '/admin/news' },
     { name: 'Trips', icon: 'airplane', route: '/admin' },
-    { name: 'Bookings', icon: 'list', route: '/admin' },
     { name: 'Inspector', icon: 'search', route: '/admin/inspector' },
     { name: 'Billing', icon: 'card', route: '/admin/billing' },
     { name: 'Analytics', icon: 'trending-up', route: '/admin/analytics' },
@@ -43,7 +81,8 @@ export default function AdminDashboard() {
   ];
 
   const stats = [
-    { label: 'Revenue', value: '$2.4M', change: '+12%', icon: 'stats-chart' },
+    { label: 'Revenue', value: `$${(totalRevenue/1000).toFixed(1)}k`, change: '+12%', icon: 'stats-chart' },
+    { label: 'Broker Profit', value: `$${(totalProfit/1000).toFixed(1)}k`, change: '+8%', icon: 'cash' },
     { label: 'Growth', value: '45%', change: '+5%', icon: 'flame' },
   ];
 
@@ -100,8 +139,11 @@ export default function AdminDashboard() {
             >
               <Text style={styles.themeIcon}>{isDark ? '☀️' : '🌙'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.createBtn}>
-              <Text style={styles.createBtnText}>+ Create Project</Text>
+            <TouchableOpacity 
+              style={styles.createBtn}
+              onPress={() => setIsRegisterModalVisible(true)}
+            >
+              <Text style={styles.createBtnText}>+ Register Company</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -175,6 +217,67 @@ export default function AdminDashboard() {
       >
         <Text style={styles.exitIcon}>✕</Text>
       </TouchableOpacity>
+
+      {/* Register Company Modal */}
+      <Modal
+        visible={isRegisterModalVisible}
+        transparent
+        animationType="slide"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, dynamicStyles.card]}>
+             <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, dynamicStyles.text]}>Register New Company</Text>
+                <TouchableOpacity onPress={() => setIsRegisterModalVisible(false)}>
+                   <Ionicons name="close" size={24} color={isDark ? '#FFF' : '#000'} />
+                </TouchableOpacity>
+             </View>
+
+             <View style={styles.modalBody}>
+                <View style={styles.inputGroup}>
+                   <Text style={[styles.inputLabel, dynamicStyles.subText]}>Company Name</Text>
+                   <TextInput 
+                      style={[styles.input, { backgroundColor: isDark ? '#000' : '#F3F4F6', color: isDark ? '#FFF' : '#000' }]} 
+                      placeholder="e.g. Alkhudari Express"
+                      placeholderTextColor="#666"
+                      value={newCompanyName}
+                      onChangeText={setNewCompanyName}
+                   />
+                </View>
+
+                <View style={styles.inputGroup}>
+                   <Text style={[styles.inputLabel, dynamicStyles.subText]}>Domain / Brand</Text>
+                   <TextInput 
+                      style={[styles.input, { backgroundColor: isDark ? '#000' : '#F3F4F6', color: isDark ? '#FFF' : '#000' }]} 
+                      placeholder="e.g. travel.alkhudari.com"
+                      placeholderTextColor="#666"
+                      value={newCompanyDomain}
+                      onChangeText={setNewCompanyDomain}
+                   />
+                </View>
+
+                <View style={styles.inputGroup}>
+                   <Text style={[styles.inputLabel, dynamicStyles.subText]}>Master API Key (RapidAPI)</Text>
+                   <TextInput 
+                      style={[styles.input, { backgroundColor: isDark ? '#000' : '#F3F4F6', color: isDark ? '#FFF' : '#000' }]} 
+                      placeholder="Paste your master key here..."
+                      placeholderTextColor="#666"
+                      secureTextEntry
+                      value={newApiKey}
+                      onChangeText={setNewApiKey}
+                   />
+                </View>
+
+                <TouchableOpacity 
+                   style={styles.deployBtn}
+                   onPress={handleRegisterCompany}
+                >
+                   <Text style={styles.deployBtnText}>DEPLOY NEW TENANT</Text>
+                </TouchableOpacity>
+             </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -473,5 +576,63 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '800',
-  }
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 500,
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  modalBody: {
+    gap: 20,
+  },
+  inputGroup: {
+    gap: 8,
+  },
+  inputLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  input: {
+    height: 52,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontWeight: '600',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
+  },
+  deployBtn: {
+    backgroundColor: '#FFD400',
+    height: 56,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  deployBtnText: {
+    color: '#000',
+    fontWeight: '900',
+    fontSize: 14,
+    letterSpacing: 1,
+  },
 });

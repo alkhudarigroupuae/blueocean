@@ -38,7 +38,17 @@ export interface Review {
   rating: number;
   comment: string;
   date: string;
-  avatar?: string;
+  avatar?: string | null;
+}
+
+export interface NewsPost {
+  id: string;
+  title: string;
+  subtitle: string;
+  content: string;
+  image: string;
+  createdAt: string;
+  author: string;
 }
 
 export interface Destination {
