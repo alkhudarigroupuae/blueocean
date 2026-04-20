@@ -1,40 +1,41 @@
 {
   "expo": {
-    "name": "Blue Ocean",
-    "slug": "BlueOcean",
+    "name": "ecommerco.ai",
+    "slug": "ecommerco-ai",
     "version": "1.0.0",
-    "scheme": "blueocean",
+    "scheme": "ecommerco",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0066CC"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.blueocean.travel"
+      "bundleIdentifier": "ai.ecommerco.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0066CC"
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.blueocean.travel"
+      "package": "ai.ecommerco.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "description": "Enterprise Travel & Brokerage Platform by Alkhudari Group",
-      "shortName": "BlueOcean",
-      "themeColor": "#0066CC",
-      "backgroundColor": "#0066CC",
+      "description": "Imperial Enterprise SaaS & Brokerage Platform",
+      "shortName": "ecommerco",
+      "themeColor": "#FFD400",
+      "backgroundColor": "#000000",
       "display": "standalone",
-      "orientation": "portrait"
+      "orientation": "portrait",
+      "lang": "en"
     },
     "plugins": [
       "expo-router",

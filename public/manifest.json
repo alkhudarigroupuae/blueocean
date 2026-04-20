@@ -1,6 +1,6 @@
 {
-  "short_name": "BlueOcean",
-  "name": "Blue Ocean Enterprise Travel",
+  "short_name": "ecommerco",
+  "name": "ecommerco.ai Imperial SaaS",
   "icons": [
     {
       "src": "/assets/icon.png",
@@ -13,8 +13,8 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#0066CC",
-  "background_color": "#0066CC"
+  "theme_color": "#FFD400",
+  "background_color": "#000000"
 }
