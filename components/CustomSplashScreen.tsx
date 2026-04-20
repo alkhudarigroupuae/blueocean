@@ -30,30 +30,33 @@ export const CustomSplashScreen: React.FC<CustomSplashScreenProps> = ({ onFinish
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
+        duration: 800,
+        useNativeDriver: Platform.OS !== 'web',
       }),
       Animated.spring(scaleAnim, {
         toValue: 1,
         friction: 4,
         tension: 10,
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
+        duration: 600,
+        useNativeDriver: Platform.OS !== 'web',
       }),
     ]).start();
 
-    // Auto-finish after 3 seconds
+    // Auto-finish after 2 seconds - Faster for better UX
     const timer = setTimeout(() => {
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }).start(() => onFinish());
-    }, 3000);
+        duration: 500,
+        useNativeDriver: Platform.OS !== 'web',
+      }).start(() => {
+        console.log('[Imperial Engine] Handshake Complete - Hiding Splash');
+        onFinish();
+      });
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);

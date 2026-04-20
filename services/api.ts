@@ -142,6 +142,19 @@ export const sampleDestinations: Destination[] = [
     description: 'The city of lights awaits. Visit the Eiffel Tower, Louvre Museum, and enjoy charming street cafes.',
     duration: '5 Days',
     highlights: ['Eiffel Tower Dinner', 'Museum Pass', 'River Cruise'],
+  },
+  {
+    id: '6',
+    name: 'Beirut Heritage',
+    country: 'Lebanon',
+    image: 'https://images.unsplash.com/photo-1590076214537-1e3c7c996e41?w=800&q=80',
+    price: 1299,
+    highestPrice: 1800,
+    rating: 4.7,
+    reviewCount: 142,
+    description: 'Explore the Paris of the Middle East. From the Raouche Rocks to the vibrant streets of Hamra.',
+    duration: '4 Days',
+    highlights: ['City Tour', 'Nightlife Access', 'Traditional Dinner'],
   }
 ];
 

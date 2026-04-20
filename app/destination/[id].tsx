@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Dimensions, Share, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Dimensions, Share, Modal, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import { Header, Button } from '../../components/Header';
@@ -17,8 +17,33 @@ export default function DestinationDetailScreen() {
   const isDark = theme === 'dark';
   const { id } = useLocalSearchParams();
   
-  // Look in global store first, then fallback to sampleDestinations
-  const destination = destinations.find(d => d.id === id) || sampleDestinations.find(d => d.id === id);
+  const [loading, setLoading] = useState(!destinations.length && !sampleDestinations.find(d => d.id === id));
+  const [activeDestination, setActiveDestination] = useState<Destination | undefined>(
+    destinations.find(d => d.id === id) || sampleDestinations.find(d => d.id === id)
+  );
+
+  useEffect(() => {
+    // If destination not found in memory (e.g. direct link), trigger a fetch
+    if (!activeDestination && id) {
+      const autoFetch = async () => {
+        setLoading(true);
+        try {
+          // This will fetch featured data which includes Beirut/Dubai/Maldives
+          // and populate the global store
+          const realData = await getFeaturedDestinations();
+          const found = realData.find(d => d.id === id);
+          if (found) setActiveDestination(found);
+        } catch (error) {
+          console.error('[Imperial Engine] Auto-fetch failed for direct link:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      autoFetch();
+    }
+  }, [id, activeDestination]);
+
+  const destination = activeDestination;
 
   const [selectedOffer, setSelectedOffer] = useState<PriceOffer | null>(null);
 
@@ -40,6 +65,15 @@ export default function DestinationDetailScreen() {
     subText: { color: isDark ? '#A1A1AA' : '#666666' },
     card: { backgroundColor: isDark ? '#0A0A0A' : '#F9FAFB', borderColor: isDark ? '#27272A' : '#E5E7EB' },
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, dynamicStyles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={primaryColor} />
+        <Text style={[dynamicStyles.text, { marginTop: 20 }]}>Establishing Handshake...</Text>
+      </View>
+    );
+  }
 
   if (!destination) {
     return (

@@ -64,11 +64,12 @@ export default function SearchScreen() {
     else setIsLoading(true);
 
     try {
-      let data;
+      let data: Destination[];
       if (searchQuery.length > 0) {
         data = await searchFlights('DXB', searchQuery, apiSettings.branding.companyName);
       } else {
-        data = sampleDestinations;
+        const featured = await getFeaturedDestinations();
+        data = featured.length > 0 ? featured : sampleDestinations;
       }
 
       // Apply Advanced Filters
