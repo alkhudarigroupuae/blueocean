@@ -1,5 +1,5 @@
 /**
- * Alkhudari Group - Imperial SEO Engine
+ * ecommerco.ai - Imperial SEO Engine
  * This service communicates directly with Google Search Console via Structured Data (JSON-LD)
  * to ensure #1 ranking for high-intent travel keywords.
  */

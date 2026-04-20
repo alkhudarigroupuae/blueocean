@@ -96,22 +96,40 @@ export const useStore = create<AppState>((set) => ({
   bookings: [],
   news: [
     { 
-      id: '1', 
-      title: 'Global Travel Update', 
-      subtitle: 'New visa-free routes for 2026', 
-      content: 'The world is opening up! Several countries have announced new visa-free travel arrangements for UAE residents in 2026.',
-      image: 'https://images.unsplash.com/photo-1502602898657-3e917247a184?auto=format&fit=crop&w=800&q=80',
+      id: 'n1', 
+      title: 'ecommerco.ai V2 Launch', 
+      subtitle: 'The new standard in Enterprise SaaS', 
+      content: 'We are proud to announce the launch of ecommerco.ai V2, featuring our proprietary Imperial Handshake engine and OLED-optimized architecture.',
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
       createdAt: new Date().toISOString(),
-      author: 'Admin'
+      author: 'Imperial Team'
     },
     { 
-      id: '2', 
-      title: 'Dubai Luxury Deals', 
-      subtitle: 'Save 40% on Burj Al Arab packages', 
-      content: 'Experience the height of luxury for less. Exclusive summer discounts are now available for all Imperial travel members.',
-      image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80',
+      id: 'n2', 
+      title: 'Imperial Engine Handshake', 
+      subtitle: 'Real-time price brokerage activated', 
+      content: 'Our global node clusters are now live, providing real-time price brokerage across 50+ countries with sub-200ms latency.',
+      image: 'https://images.unsplash.com/photo-1551288049-bbbda536339a?auto=format&fit=crop&w=1200&q=80',
       createdAt: new Date().toISOString(),
-      author: 'Admin'
+      author: 'Engineering'
+    },
+    { 
+      id: 'n3', 
+      title: 'Global Node Clusters', 
+      subtitle: 'New low-latency servers in Beirut & Dubai', 
+      content: 'Expansion of our infrastructure continues with new edge nodes in the Middle East, ensuring the fastest booking experience for our regional partners.',
+      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=1200&q=80',
+      createdAt: new Date().toISOString(),
+      author: 'Infrastructure'
+    },
+    { 
+      id: 'n4', 
+      title: 'Zero-Compute Architecture', 
+      subtitle: 'The future of local IDE development', 
+      content: 'Our new zero-compute local IDE model allows developers to build massive platforms without the need for heavy local processing power.',
+      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80',
+      createdAt: new Date().toISOString(),
+      author: 'CEO Office'
     }
   ],
   selectedDestination: null,

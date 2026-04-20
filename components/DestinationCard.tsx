@@ -41,12 +41,12 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, o
           <View style={styles.priceTag}>
             <View>
               <Text style={styles.priceLabel}>Starting from</Text>
-              <Text style={styles.price}>${destination.price}</Text>
+              <Text style={styles.price}>${destination.price.toFixed(2)}</Text>
             </View>
             {destination.highestPrice && (
               <View style={[styles.highestPriceContainer, isDark && { borderLeftColor: '#333' }]}>
                 <Text style={styles.highestPriceLabel}>Up to</Text>
-                <Text style={styles.highestPrice}>${destination.highestPrice}</Text>
+                <Text style={styles.highestPrice}>${destination.highestPrice.toFixed(2)}</Text>
               </View>
             )}
           </View>

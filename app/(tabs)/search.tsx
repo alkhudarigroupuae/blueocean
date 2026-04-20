@@ -4,12 +4,12 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, SearchBar } from '../../components/Header';
 import { useStore } from '../../store';
-import { searchFlights, sampleDestinations } from '../../services/api';
+import { searchFlights, sampleDestinations, getFeaturedDestinations } from '../../services/api';
 import { Colors, Destination } from '../../types';
 
 export default function SearchScreen() {
   const router = useRouter();
-  const { searchQuery, setSearchQuery, theme, apiSettings } = useStore();
+  const { searchQuery, setSearchQuery, theme, apiSettings, setDestinations } = useStore();
   const [results, setResults] = useState<Destination[]>([]);
   const [visibleResults, setVisibleResults] = useState<Destination[]>([]);
   const [page, setPage] = useState(1);
@@ -22,10 +22,11 @@ export default function SearchScreen() {
   const ITEMS_PER_PAGE = 20;
   
   const isDark = theme === 'dark';
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
   const dynamicStyles = {
     container: { backgroundColor: isDark ? '#000000' : Colors.backgroundLight },
     text: { color: isDark ? '#FFFFFF' : Colors.text },
-    subText: { color: isDark ? '#888888' : Colors.textLight },
+    subText: { color: isDark ? '#A1A1AA' : Colors.textLight },
     card: { backgroundColor: isDark ? '#0A0A0A' : Colors.white, borderColor: isDark ? '#1A1A1A' : Colors.border },
     header: { backgroundColor: isDark ? '#0A0A0A' : Colors.white },
   };
@@ -118,28 +119,31 @@ export default function SearchScreen() {
   };
 
   const renderItem = ({ item }: { item: Destination }) => (
-    <TouchableOpacity style={styles.resultCard} onPress={() => handleDestinationPress(item.id)}>
+    <TouchableOpacity 
+      style={[styles.resultCard, dynamicStyles.card, { borderWidth: 1 }]} 
+      onPress={() => handleDestinationPress(item.id)}
+    >
       <Image source={{ uri: item.image }} style={styles.resultImage} />
       <View style={styles.resultContent}>
         <View style={styles.resultHeader}>
-          <Text style={styles.resultName}>{item.name}</Text>
-          <View style={styles.ratingBadge}>
-            <Text style={styles.ratingText}>★ {item.rating}</Text>
+          <Text style={[styles.resultName, dynamicStyles.text]}>{item.name}</Text>
+          <View style={[styles.ratingBadge, { backgroundColor: primaryColor + '20' }]}>
+            <Text style={[styles.ratingText, { color: primaryColor }]}>★ {item.rating}</Text>
           </View>
         </View>
-        <Text style={styles.resultLocation}>{item.country}</Text>
-        <View style={styles.priceComparisonRow}>
+        <Text style={[styles.resultLocation, dynamicStyles.subText]}>{item.country}</Text>
+        <View style={[styles.priceComparisonRow, dynamicStyles.card, { borderWidth: 1 }]}>
            <View>
-              <Text style={styles.priceLabel}>Min</Text>
-              <Text style={styles.minPrice}>${item.price}</Text>
+              <Text style={[styles.priceLabel, dynamicStyles.subText]}>Min</Text>
+              <Text style={[styles.minPrice, { color: primaryColor }]}>${item.price.toFixed(2)}</Text>
            </View>
            {item.highestPrice && (
-              <View style={styles.priceDivider} />
+              <View style={[styles.priceDivider, { backgroundColor: isDark ? '#27272A' : '#eee' }]} />
            )}
            {item.highestPrice && (
               <View>
-                <Text style={styles.priceLabel}>Max</Text>
-                <Text style={styles.maxPrice}>${item.highestPrice}</Text>
+                <Text style={[styles.priceLabel, dynamicStyles.subText]}>Max</Text>
+                <Text style={[styles.maxPrice, dynamicStyles.text]}>${item.highestPrice.toFixed(2)}</Text>
               </View>
            )}
         </View>
@@ -149,7 +153,12 @@ export default function SearchScreen() {
 
   return (
     <View style={[styles.container, dynamicStyles.container]}>
-      <Header title="Search" />
+      <View style={styles.headerWithBack}>
+        <Header title="Search" />
+        <TouchableOpacity style={styles.topRightBack} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color={isDark ? '#FFF' : '#000'} />
+        </TouchableOpacity>
+      </View>
       <SearchBar
         value={searchQuery}
         onChangeText={setSearchQuery}
@@ -232,12 +241,12 @@ export default function SearchScreen() {
               <View style={styles.priceFilterRow}>
                 {[500, 1000, 2000, 5000].map(p => (
                   <TouchableOpacity 
-                    key={p} 
-                    style={[styles.priceChip, priceRange[1] === p && styles.activePriceChip, isDark && { backgroundColor: '#111', borderColor: '#222' }]}
-                    onPress={() => setPriceRange([0, p])}
-                  >
-                    <Text style={[styles.priceChipText, dynamicStyles.text, priceRange[1] === p && styles.activePriceChipText]}>Up to ${p}</Text>
-                  </TouchableOpacity>
+            key={p} 
+            style={[styles.priceChip, priceRange[1] === p && { borderColor: primaryColor, backgroundColor: primaryColor + '10' }, isDark && { backgroundColor: '#111', borderColor: '#222' }]}
+            onPress={() => setPriceRange([0, p])}
+          >
+            <Text style={[styles.priceChipText, dynamicStyles.text, priceRange[1] === p && { color: primaryColor }]}>Up to ${p}</Text>
+          </TouchableOpacity>
                 ))}
               </View>
 
@@ -287,14 +296,14 @@ export default function SearchScreen() {
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={() => (
-          isLoading ? <ActivityIndicator size="small" color={Colors.primary} style={{ margin: 20 }} /> : null
+          isLoading ? <ActivityIndicator size="small" color={primaryColor} style={{ margin: 20 }} /> : null
         )}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={onRefresh} 
-            tintColor={Colors.primary}
-            colors={[Colors.primary]} 
+            tintColor={primaryColor}
+            colors={[primaryColor]} 
           />
         }
         ListEmptyComponent={
@@ -656,5 +665,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textMuted,
     marginTop: 8,
+  },
+  headerWithBack: {
+    position: 'relative',
+  },
+  topRightBack: {
+    position: 'absolute',
+    top: 55,
+    right: 20,
+    zIndex: 100,
+    padding: 8,
   },
 });

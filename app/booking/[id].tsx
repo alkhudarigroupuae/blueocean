@@ -186,17 +186,17 @@ export default function BookingScreen() {
         <View style={[styles.priceCard, dynamicStyles.card, { borderWidth: 1 }]}>
           <Text style={[styles.priceTitle, dynamicStyles.text]}>Price Summary</Text>
           <View style={styles.priceRow}>
-            <Text style={[styles.priceLabel, dynamicStyles.subText]}>${selectedPrice} × {guests} guest(s)</Text>
-            <Text style={[styles.priceValue, dynamicStyles.text]}>${totalPrice}</Text>
+            <Text style={[styles.priceLabel, dynamicStyles.subText]}>${selectedPrice.toFixed(2)} × {guests} guest(s)</Text>
+            <Text style={[styles.priceValue, dynamicStyles.text]}>${totalPrice.toFixed(2)}</Text>
           </View>
           <View style={styles.priceRow}>
             <Text style={[styles.priceLabel, dynamicStyles.subText]}>Taxes & Fees</Text>
-            <Text style={[styles.priceValue, dynamicStyles.text]}>${Math.round(totalPrice * 0.1)}</Text>
+            <Text style={[styles.priceValue, dynamicStyles.text]}>${(totalPrice * 0.1).toFixed(2)}</Text>
           </View>
           <View style={[styles.priceDivider, { backgroundColor: dynamicStyles.card.borderColor }]} />
           <View style={styles.priceRow}>
             <Text style={[styles.totalLabel, dynamicStyles.text]}>Total</Text>
-            <Text style={[styles.totalValue, { color: primaryColor }]}>${grandTotal}</Text>
+            <Text style={[styles.totalValue, { color: primaryColor }]}>${grandTotal.toFixed(2)}</Text>
           </View>
         </View>
 

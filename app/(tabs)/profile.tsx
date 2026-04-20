@@ -6,19 +6,26 @@ import { useStore } from '../../store';
 import { Logo } from '../../components/Logo';
 import { translations } from '../../services/translations';
 import { Colors } from '../../types';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, setUser, language, setLanguage, theme, setTheme } = useStore();
+  const { user, setUser, language, setLanguage, theme, setTheme, apiSettings } = useStore();
   const [notifications, setNotifications] = React.useState(true);
   
   const isDark = theme === 'dark';
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
   const dynamicStyles = {
-    container: { backgroundColor: isDark ? '#000000' : Colors.backgroundLight },
-    text: { color: isDark ? '#FFFFFF' : Colors.text },
-    subText: { color: isDark ? '#888888' : Colors.textLight },
-    card: { backgroundColor: isDark ? '#0A0A0A' : Colors.white, borderColor: isDark ? '#1A1A1A' : Colors.border },
-    header: { backgroundColor: isDark ? '#0A0A0A' : Colors.white },
+    container: { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
+    text: { color: isDark ? '#FFFFFF' : '#111827' },
+    subText: { color: isDark ? '#A1A1AA' : '#71717A' },
+    card: { 
+      backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
+      borderColor: isDark ? '#27272A' : '#F4F4F5',
+      borderWidth: 1,
+      shadowOpacity: isDark ? 0 : 0.02,
+    },
+    header: { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
   };
 
   // Translation Helper
@@ -46,17 +53,17 @@ export default function ProfileScreen() {
   ];
 
   const menuItems = [
-    { icon: '👤', title: t.editProfile, onPress: () => setIsEditModalVisible(true) },
-    { icon: isDark ? '☀️' : '🌙', title: isDark ? 'Day Mode' : 'Night Mode', onPress: () => setTheme(isDark ? 'light' : 'dark') },
-    { icon: '💳', title: 'Payment Methods', onPress: () => router.push('/profile/payments') },
-    { icon: '🔔', title: 'Notifications', onPress: () => {}, hasSwitch: true },
-    { icon: '🌐', title: t.language, onPress: () => setIsLanguageModalVisible(true), right: languages.find(l => l.code === language)?.name },
-    { icon: '💰', title: 'Currency', onPress: () => {}, right: 'USD' },
-    { icon: '🏢', title: t.adminDashboard, onPress: () => router.push('/admin'), textColor: '#FFD400' },
-    { icon: '❓', title: 'Help & Support', onPress: () => {} },
-    { icon: '📜', title: 'Terms & Conditions', onPress: () => {} },
-    { icon: '🔒', title: 'Privacy Policy', onPress: () => {} },
-    { icon: '🚪', title: 'Log Out', onPress: () => {}, textColor: Colors.error },
+    { icon: 'person-outline', title: t.editProfile, onPress: () => setIsEditModalVisible(true) },
+    { icon: isDark ? 'sunny-outline' : 'moon-outline', title: isDark ? 'Day Mode' : 'Night Mode', onPress: () => setTheme(isDark ? 'light' : 'dark') },
+    { icon: 'card-outline', title: 'Payment Methods', onPress: () => router.push('/profile/payments') },
+    { icon: 'notifications-outline', title: 'Notifications', onPress: () => {}, hasSwitch: true },
+    { icon: 'globe-outline', title: t.language, onPress: () => setIsLanguageModalVisible(true), right: languages.find(l => l.code === language)?.name },
+    { icon: 'cash-outline', title: 'Currency', onPress: () => {}, right: 'USD' },
+    { icon: 'shield-outline', title: t.adminDashboard, onPress: () => router.push('/admin'), textColor: primaryColor },
+    { icon: 'help-circle-outline', title: 'Help & Support', onPress: () => {} },
+    { icon: 'document-text-outline', title: 'Terms & Conditions', onPress: () => {} },
+    { icon: 'lock-closed-outline', title: 'Privacy Policy', onPress: () => {} },
+    { icon: 'log-out-outline', title: 'Log Out', onPress: () => {}, textColor: Colors.error },
   ];
 
   return (
@@ -74,8 +81,8 @@ export default function ProfileScreen() {
               <Text style={styles.editAvatarText}>✏️</Text>
             </TouchableOpacity>
           </View>
-          <Text style={[styles.userName, dynamicStyles.text]}>{user?.name || 'Blue Ocean User'}</Text>
-          <Text style={[styles.userEmail, dynamicStyles.subText]}>{user?.email || 'user@blueocean.com'}</Text>
+          <Text style={[styles.userName, dynamicStyles.text]}>{user?.name || 'Imperial User'}</Text>
+          <Text style={[styles.userEmail, dynamicStyles.subText]}>{user?.email || 'user@ecommerco.ai'}</Text>
         </View>
 
         {/* Stats */}
@@ -97,9 +104,9 @@ export default function ProfileScreen() {
         </View>
 
         {/* ecommerco.ai Brand Section */}
-        <View style={[styles.brandCard, dynamicStyles.card, { alignItems: 'center', backgroundColor: isDark ? '#0A0A0A' : '#F9FAFB' }]}>
+        <View style={[styles.brandCard, dynamicStyles.card, { alignItems: 'center', backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderWidth: isDark ? 1 : 0, shadowOpacity: isDark ? 0 : 0.05 }]}>
           <Logo size="large" />
-          <Text style={[styles.brandTagline, dynamicStyles.subText, { marginTop: 10 }]}>Imperial Enterprise SaaS Platform</Text>
+          <Text style={[styles.brandTagline, dynamicStyles.subText, { marginTop: 15, fontWeight: '700', letterSpacing: 1 }]}>ESTABLISHING IMPERIAL CONNECTION</Text>
         </View>
 
         {/* Menu Items */}
@@ -107,11 +114,11 @@ export default function ProfileScreen() {
           {menuItems.map((item, index) => (
             <TouchableOpacity 
               key={index} 
-              style={[styles.menuItem, { borderBottomColor: isDark ? '#1A1A1A' : Colors.border }]}
+              style={[styles.menuItem, { borderBottomColor: isDark ? '#1A1A1A' : '#F4F4F5' }]}
               onPress={item.onPress}
             >
               <View style={styles.menuLeft}>
-                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <Ionicons name={item.icon as any} size={22} color={item.textColor || (isDark ? '#FFFFFF' : '#111827')} style={styles.menuIcon} />
                 <Text style={[styles.menuTitle, dynamicStyles.text, item.textColor && { color: item.textColor }]}>
                   {item.title}
                 </Text>

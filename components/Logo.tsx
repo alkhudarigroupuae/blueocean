@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
 import { Colors } from '../types';
@@ -10,9 +10,10 @@ export const Logo: React.FC<{ size?: 'small' | 'large', mode?: 'full' | 'icon' }
   const { apiSettings, theme } = useStore();
   const { branding } = apiSettings;
   const isDark = theme === 'dark';
+  const primaryColor = branding.primaryColor || Colors.primary;
 
   const renderLogo = () => {
-    // If explicit mode is icon, always return the icon
+    // If explicit mode is icon, always return the image icon
     if (mode === 'icon') {
       return (
         <Image 
@@ -31,10 +32,10 @@ export const Logo: React.FC<{ size?: 'small' | 'large', mode?: 'full' | 'icon' }
       case 'FullText':
         return (
           <View style={styles.textWrapper}>
-            <Text style={[styles.brandText, isLarge ? styles.textLarge : styles.textSmall, { color: Colors.primary }]}>
+            <Text style={[styles.brandText, isLarge ? styles.textLarge : styles.textSmall, { color: primaryColor }]}>
               {mainName.toUpperCase()}
             </Text>
-            <Text style={[styles.groupText, isLarge ? styles.groupLarge : styles.groupSmall, { color: isDark ? '#FFF' : '#000' }]}>
+            <Text style={[styles.groupText, isLarge ? styles.groupLarge : styles.groupSmall, { color: isDark ? '#FFFFFF' : '#111827' }]}>
               {extension.toUpperCase()}
             </Text>
           </View>
@@ -48,10 +49,10 @@ export const Logo: React.FC<{ size?: 'small' | 'large', mode?: 'full' | 'icon' }
               resizeMode="contain"
             />
             <View style={styles.hybridTextWrapper}>
-              <Text style={[styles.brandText, isLarge ? styles.textMedium : styles.textXSmall, { color: Colors.primary }]}>
+              <Text style={[styles.brandText, isLarge ? styles.textMedium : styles.textXSmall, { color: primaryColor }]}>
                 {mainName.toUpperCase()}
               </Text>
-              <Text style={[styles.groupText, isLarge ? styles.groupMedium : styles.groupXSmall, { color: isDark ? '#FFF' : '#000' }]}>
+              <Text style={[styles.groupText, isLarge ? styles.groupMedium : styles.groupXSmall, { color: isDark ? '#FFFFFF' : '#111827' }]}>
                 {extension.toUpperCase()}
               </Text>
             </View>

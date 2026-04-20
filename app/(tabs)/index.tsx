@@ -7,7 +7,7 @@ import { Logo } from '../../components/Logo';
 import { DestinationCard } from '../../components/DestinationCard';
 import { Header, SearchBar } from '../../components/Header';
 import { useStore } from '../../store';
-import { getFeaturedDestinations, sampleDestinations } from '../../services/api';
+import { getFeaturedDestinations, sampleDestinations, searchFlights } from '../../services/api';
 import { SEO_CONFIG } from '../../services/seo';
 import { Colors, Destination } from '../../types';
 
@@ -45,24 +45,22 @@ export default function HomeScreen() {
   const isDark = theme === 'dark';
   const dynamicStyles = {
     container: { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
-    text: { color: isDark ? '#FFFFFF' : Colors.text },
-    subText: { color: isDark ? '#A1A1AA' : Colors.textLight },
+    text: { color: isDark ? '#FFFFFF' : '#111827' },
+    subText: { color: isDark ? '#A1A1AA' : '#71717A' },
     sectionTitle: { color: isDark ? '#FFFFFF' : '#111827' },
+    card: { 
+      backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
+      borderColor: isDark ? '#27272A' : '#F4F4F5',
+      borderWidth: 1,
+      shadowOpacity: isDark ? 0 : 0.02,
+    },
   };
-
-  const travelNews = [
-    { title: 'ecommerco.ai V2 Launch', subtitle: 'The new standard in Enterprise SaaS', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80' },
-    { title: 'Imperial Engine Handshake', subtitle: 'Real-time price brokerage activated', image: 'https://images.unsplash.com/photo-1551288049-bbbda536339a?w=800&q=80' },
-    { title: 'Global Node Clusters', subtitle: 'New low-latency servers in Beirut & Dubai', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=800&q=80' },
-    { title: 'Zero-Compute Architecture', subtitle: 'The future of local IDE development', image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80' },
-  ];
 
   const loadRealData = async () => {
     try {
       const realData = await getFeaturedDestinations();
       setFeatured(realData.slice(0, 5));
       setPopular(realData.slice(5, 10));
-      // Store all fetched destinations in global state so detail pages can find them
       setDestinations(realData);
     } catch (error) {
       console.error(error);
@@ -87,23 +85,9 @@ export default function HomeScreen() {
   }, [news]);
 
   useEffect(() => {
-    const loadRealData = async () => {
-      setLoading(true);
-      try {
-        const brandingName = apiSettings.branding.companyName;
-        const realData = await getFeaturedDestinations();
-        setFeatured(realData.slice(0, 5));
-        setPopular(realData.slice(5, 10));
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadRealData();
   }, [apiSettings.branding.companyName]);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Destination[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -136,12 +120,11 @@ export default function HomeScreen() {
       <Head>
         <title>{SEO_CONFIG.metaTags.home.title}</title>
         <meta name="description" content={SEO_CONFIG.metaTags.home.description} />
-        <meta name="google-site-verification" content={SEO_CONFIG.googleSiteVerification} />
       </Head>
       <View style={styles.headerRow}>
         <Logo size="small" />
-        <TouchableOpacity style={[styles.profileIcon, { backgroundColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} onPress={() => router.push('/profile')}>
-           <Ionicons name="person-outline" size={20} color={isDark ? '#FFF' : '#000'} />
+        <TouchableOpacity style={[styles.profileIcon, { backgroundColor: isDark ? '#1A1A1A' : '#F4F4F5' }]} onPress={() => router.push('/profile')}>
+           <Ionicons name="person-outline" size={20} color={isDark ? '#FFFFFF' : '#111827'} />
         </TouchableOpacity>
       </View>
 
@@ -156,14 +139,14 @@ export default function HomeScreen() {
       />
 
       {showSuggestions && suggestions.length > 0 && (
-        <View style={[styles.suggestionsContainer, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : Colors.border }]}>
+        <View style={[styles.suggestionsContainer, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#27272A' : '#F4F4F5' }]}>
           {suggestions.map((item) => (
             <TouchableOpacity 
               key={item.id} 
               style={styles.suggestionItem}
               onPress={() => handleSuggestionPress(item)}
             >
-              <Text style={styles.suggestionIcon}>📍</Text>
+              <Ionicons name="location-outline" size={18} color={primaryColor} style={{ marginRight: 12 }} />
               <View>
                 <Text style={[styles.suggestionName, dynamicStyles.text]}>{item.name}</Text>
                 <Text style={[styles.suggestionCountry, dynamicStyles.subText]}>{item.country}</Text>
@@ -205,12 +188,12 @@ export default function HomeScreen() {
                 style={StyleSheet.absoluteFill} 
                 resizeMode="cover"
               />
-              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)' }]} />
               
               <View style={styles.heroTextContainer}>
-                <Text style={styles.heroTitle}>{item.title}</Text>
-                <Text style={styles.heroTitleAccent}>{item.subtitle}</Text>
-                <Text style={styles.heroSubtitle}>Exclusive Imperial News by {apiSettings.branding.companyName}</Text>
+                <Text style={styles.heroTitle}>{item.title.toUpperCase()}</Text>
+                <Text style={[styles.heroTitleAccent, { color: primaryColor }]}>{item.subtitle}</Text>
+                <Text style={styles.heroSubtitle}>Establishing Imperial Connection</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -220,184 +203,68 @@ export default function HomeScreen() {
           {news.map((_, i) => (
             <View 
               key={i} 
-              style={[styles.dot, newsIndex === i && styles.activeDot]} 
+              style={[styles.dot, newsIndex === i ? { backgroundColor: primaryColor, width: 20 } : { backgroundColor: 'rgba(255,255,255,0.3)' }]} 
             />
           ))}
         </View>
 
-        {/* Quick Actions moved over Featured Destinations */}
+        {/* Quick Actions */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { paddingHorizontal: 20, marginBottom: 16 }]}>QUICK ACTIONS</Text>
+          <View style={[styles.actionGrid, { paddingHorizontal: 20 }]}>
+            {[
+              { label: 'Flights', icon: 'airplane', route: '/search' },
+              { label: 'Hotels', icon: 'business', route: '/search' },
+              { label: 'Packages', icon: 'map', route: '/search' },
+              { label: 'Dining', icon: 'restaurant', route: null, color: '#EF4444' },
+            ].map((action, i) => (
+              <Animated.View key={i} style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: i === 0 ? 0 : 10 }}>
+                <TouchableOpacity 
+                  activeOpacity={0.7}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  style={[styles.actionCard, dynamicStyles.card]} 
+                  onPress={() => action.route ? router.push(action.route as any) : Alert.alert('Imperial Dining', 'Exclusive restaurants coming soon!')}
+                >
+                  <Ionicons name={action.icon as any} size={24} color={action.color || primaryColor} style={styles.actionIconIonic} />
+                  <Text style={[styles.actionText, dynamicStyles.text]}>{action.label}</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            ))}
+          </View>
+        </View>
+
         {/* Imperial Dining Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Imperial Dining (Bon Appétit!)</Text>
-            <TouchableOpacity onPress={() => Alert.alert('Dining Hub', 'Booking a table at Raouche Rocks or Burj Al Arab? Coming soon!')}>
-              <Text style={styles.seeAll}>See All →</Text>
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>IMPERIAL DINING</Text>
+            <TouchableOpacity onPress={() => Alert.alert('Dining Hub', 'Establishing Imperial Handshake...')}>
+              <Text style={[styles.seeAll, { color: primaryColor }]}>See All →</Text>
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardList}>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Raouche Rocks', 'Booking available from June 2026')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Lebanese Mezze</Text>
-               <Text style={styles.foodLocation}>Beirut, Lebanon</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Imperial Grill', 'Private chef sessions available')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Imperial Grill</Text>
-               <Text style={styles.foodLocation}>Dubai, UAE</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Al Mahara', 'Burj Al Arab underwater dining')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Al Mahara</Text>
-               <Text style={styles.foodLocation}>Dubai, UAE</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('The Ivy', 'Historic celebrity hotspot')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>The Ivy</Text>
-               <Text style={styles.foodLocation}>London, UK</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Le Jules Verne', 'Dining on the Eiffel Tower')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Le Jules Verne</Text>
-               <Text style={styles.foodLocation}>Paris, France</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Noma', 'World\'s best restaurant experience')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Noma</Text>
-               <Text style={styles.foodLocation}>Copenhagen, Denmark</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Osteria Francescana', 'Massimo Bottura\'s masterpiece')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1550966841-3ee4ad6c107c?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Osteria Francescana</Text>
-               <Text style={styles.foodLocation}>Modena, Italy</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Eleven Madison Park', 'Plant-based fine dining')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Eleven Madison Park</Text>
-               <Text style={styles.foodLocation}>New York, USA</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Gaggan Anand', 'Progressive Indian cuisine')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Gaggan Anand</Text>
-               <Text style={styles.foodLocation}>Bangkok, Thailand</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Odette', 'Modern French in Singapore')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Odette</Text>
-               <Text style={styles.foodLocation}>Singapore</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Central', 'Best of Peruvian biodiversity')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Central</Text>
-               <Text style={styles.foodLocation}>Lima, Peru</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Zuma Beirut', 'Contemporary Japanese dining')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1579027989536-b7b1f875659b?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Zuma</Text>
-               <Text style={styles.foodLocation}>Beirut, Lebanon</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Arzak', 'Basque cuisine pioneers')}>
-               <Image source={{ uri: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80' }} style={styles.foodImage} />
-               <Text style={[styles.foodName, dynamicStyles.text]}>Arzak</Text>
-               <Text style={styles.foodLocation}>San Sebastian, Spain</Text>
-            </TouchableOpacity>
+            {[
+              { name: 'Lebanese Mezze', location: 'Beirut, Lebanon', img: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?w=400&q=80' },
+              { name: 'Imperial Grill', location: 'Dubai, UAE', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80' },
+              { name: 'Al Mahara', location: 'Dubai, UAE', img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80' },
+            ].map((item, i) => (
+              <TouchableOpacity key={i} style={[styles.foodCard, dynamicStyles.card]} onPress={() => Alert.alert(item.name, 'Booking available from June 2026')}>
+                <Image source={{ uri: item.img }} style={styles.foodImage} />
+                <View style={{ padding: 12 }}>
+                    <Text style={[styles.foodName, dynamicStyles.text]}>{item.name}</Text>
+                    <Text style={[styles.foodLocation, dynamicStyles.subText]}>{item.location}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { paddingHorizontal: 20, marginBottom: 12 }]}>Quick Actions</Text>
-          <View style={[styles.actionGrid, { paddingHorizontal: 20 }]}>
-            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                style={[
-                  styles.actionCard, 
-                  { 
-                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
-                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
-                    borderWidth: isDark ? 1 : 0, // Remove border in light mode
-                    shadowOpacity: isDark ? 0 : 0.05, // Only subtle shadow in light mode
-                  }
-                ]} 
-                onPress={() => router.push('/search')}
-              >
-                <Ionicons name="airplane" size={24} color={primaryColor} style={styles.actionIconIonic} />
-                <Text style={[styles.actionText, dynamicStyles.text]}>Flights</Text>
-              </TouchableOpacity>
-            </Animated.View>
-            
-            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: 10 }}>
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                style={[
-                  styles.actionCard, 
-                  { 
-                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
-                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
-                    borderWidth: isDark ? 1 : 0,
-                    shadowOpacity: isDark ? 0 : 0.05,
-                  }
-                ]} 
-                onPress={() => router.push('/search')}
-              >
-                <Ionicons name="business" size={24} color={primaryColor} style={styles.actionIconIonic} />
-                <Text style={[styles.actionText, dynamicStyles.text]}>Hotels</Text>
-              </TouchableOpacity>
-            </Animated.View>
-
-            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: 10 }}>
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                style={[
-                  styles.actionCard, 
-                  { 
-                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
-                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
-                    borderWidth: isDark ? 1 : 0,
-                    shadowOpacity: isDark ? 0 : 0.05,
-                  }
-                ]} 
-                onPress={() => router.push('/search')}
-              >
-                <Ionicons name="map" size={24} color={primaryColor} style={styles.actionIconIonic} />
-                <Text style={[styles.actionText, dynamicStyles.text]}>Packages</Text>
-              </TouchableOpacity>
-            </Animated.View>
-
-            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: 10 }}>
-              <TouchableOpacity 
-                activeOpacity={0.7}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                style={[
-                  styles.actionCard, 
-                  { 
-                    backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', 
-                    borderColor: isDark ? '#1A1A1A' : '#F3F4F6',
-                    borderWidth: isDark ? 1 : 0,
-                    shadowOpacity: isDark ? 0 : 0.05,
-                  }
-                ]} 
-                onPress={() => Alert.alert('Imperial Dining', 'Exclusive restaurants and food tours coming soon! Bon appétit!')}
-              >
-                <Ionicons name="restaurant" size={24} color="#EF4444" style={styles.actionIconIonic} />
-                <Text style={[styles.actionText, dynamicStyles.text]}>Dining</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
         </View>
 
         {/* Featured Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Featured Destinations</Text>
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>FEATURED DESTINATIONS</Text>
             <TouchableOpacity onPress={() => router.push('/search')}>
-              <Text style={styles.seeAll}>See All →</Text>
+              <Text style={[styles.seeAll, { color: primaryColor }]}>See All →</Text>
             </TouchableOpacity>
           </View>
           {loading ? (
@@ -424,9 +291,9 @@ export default function HomeScreen() {
         {/* Popular Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Popular Packages</Text>
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>POPULAR PACKAGES</Text>
             <TouchableOpacity onPress={() => router.push('/search')}>
-              <Text style={styles.seeAll}>See All →</Text>
+              <Text style={[styles.seeAll, { color: primaryColor }]}>See All →</Text>
             </TouchableOpacity>
           </View>
           {loading ? (
@@ -450,33 +317,30 @@ export default function HomeScreen() {
           )}
         </View>
 
+        {/* Blog Insights */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Imperial Travel Insights</Text>
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>IMPERIAL INSIGHTS</Text>
             <TouchableOpacity onPress={() => router.push('/blog')}>
-              <Text style={styles.seeAll}>Full Blog →</Text>
+              <Text style={[styles.seeAll, { color: primaryColor }]}>Full Blog →</Text>
             </TouchableOpacity>
           </View>
           
           <View style={styles.verticalNewsList}>
-            {news && news.length > 0 ? (
-              news.slice(0, 5).map((item) => (
-                <TouchableOpacity 
-                  key={item.id} 
-                  style={[styles.newsRow, { backgroundColor: isDark ? '#0A0A0A' : '#FFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]}
-                  onPress={() => router.push('/blog')}
-                >
-                  <Image source={{ uri: item.image }} style={styles.newsRowImage} />
-                  <View style={styles.newsRowContent}>
-                    <Text style={[styles.newsRowTitle, dynamicStyles.text]} numberOfLines={2}>{item.title}</Text>
-                    <Text style={[styles.newsRowTime, dynamicStyles.subText]} numberOfLines={1}>{item.subtitle}</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={16} color={isDark ? '#444' : '#CCC'} />
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text style={[styles.emptyNews, dynamicStyles.subText]}>No news available.</Text>
-            )}
+            {news.slice(0, 5).map((item) => (
+              <TouchableOpacity 
+                key={item.id} 
+                style={[styles.newsRow, dynamicStyles.card]}
+                onPress={() => router.push('/blog')}
+              >
+                <Image source={{ uri: item.image }} style={styles.newsRowImage} />
+                <View style={styles.newsRowContent}>
+                  <Text style={[styles.newsRowTitle, dynamicStyles.text]} numberOfLines={2}>{item.title}</Text>
+                  <Text style={[styles.newsRowTime, dynamicStyles.subText]} numberOfLines={1}>{item.subtitle}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color={isDark ? '#27272A' : '#D1D5DB'} />
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
@@ -489,7 +353,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundLight,
   },
   headerRow: {
     flexDirection: 'row',
@@ -502,7 +365,7 @@ const styles = StyleSheet.create({
   profileIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -522,38 +385,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     bottom: 20,
-    left: 28,
+    left: 48,
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.4)',
     marginRight: 6,
-  },
-  activeDot: {
-    backgroundColor: '#FFFFFF',
-    width: 20,
   },
   heroTextContainer: {
     zIndex: 2,
   },
   suggestionsContainer: {
     position: 'absolute',
-    top: 130, // Just below the search bar
+    top: 130,
     left: 20,
     right: 20,
-    backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 8,
     zIndex: 1000,
     elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
   },
   suggestionItem: {
     flexDirection: 'row',
@@ -561,126 +413,86 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
   },
-  suggestionIcon: {
-    fontSize: 18,
-    marginRight: 12,
-  },
   suggestionName: {
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.text,
   },
   suggestionCountry: {
     fontSize: 12,
-    color: Colors.textMuted,
-    marginTop: 2,
   },
   heroTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.white,
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 2,
   },
   heroTitleAccent: {
     fontSize: 28,
-    fontWeight: '800',
-    color: Colors.white,
+    fontWeight: '900',
     marginBottom: 8,
   },
   heroSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    fontWeight: '600',
+    letterSpacing: 1,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 32,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.text,
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 1.5,
   },
   seeAll: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
   cardList: {
     paddingHorizontal: 20,
     paddingBottom: 10,
   },
   foodCard: {
-    width: 150,
-    marginRight: 15,
+    width: 200,
+    marginRight: 16,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   foodImage: {
-    width: 150,
-    height: 100,
-    borderRadius: 16,
-    marginBottom: 8,
+    width: '100%',
+    height: 120,
   },
   foodName: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '800',
   },
   foodLocation: {
     fontSize: 12,
-    color: '#666',
+    marginTop: 2,
   },
   actionGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   actionCard: {
-    flex: 1,
     alignItems: 'center',
-    paddingVertical: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    transform: [{ scale: 1 }],
-  },
-  actionIcon: {
-    fontSize: 24,
-    marginBottom: 8,
+    paddingVertical: 18,
+    borderRadius: 20,
   },
   actionIconIonic: {
-    marginBottom: 4,
+    marginBottom: 8,
   },
   actionText: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  newsCard: {
-    width: 200,
-    borderRadius: 16,
-    borderWidth: 1,
-    overflow: 'hidden',
-    marginRight: 16,
-  },
-  newsCardImage: {
-    width: '100%',
-    height: 100,
-  },
-  newsCardContent: {
-    padding: 12,
-  },
-  newsCardTitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '800',
-    marginBottom: 4,
-  },
-  newsCardSub: {
-    fontSize: 11,
+    letterSpacing: 0.5,
   },
   verticalNewsList: {
     paddingHorizontal: 20,
@@ -689,31 +501,26 @@ const styles = StyleSheet.create({
   newsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  newsRowTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  newsRowTime: {
-    fontSize: 12,
+    padding: 12,
+    borderRadius: 20,
   },
   newsRowImage: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     borderRadius: 12,
-    marginRight: 15,
   },
   newsRowContent: {
     flex: 1,
+    marginLeft: 16,
+    marginRight: 8,
   },
-  emptyNews: {
-    textAlign: 'center',
-    padding: 20,
-    fontStyle: 'italic',
+  newsRowTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  newsRowTime: {
+    fontSize: 11,
+    marginTop: 4,
   },
   bottomPadding: {
     height: 100,

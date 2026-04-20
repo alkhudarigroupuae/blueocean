@@ -14,7 +14,7 @@ const mockBookings: Booking[] = [
     guests: 2,
     totalPrice: 4998,
     status: 'confirmed',
-    confirmationCode: 'BO2024MN',
+    confirmationCode: 'ECO2024MN',
     createdAt: '2026-04-01',
   },
   {
@@ -25,31 +25,32 @@ const mockBookings: Booking[] = [
     guests: 2,
     totalPrice: 3798,
     status: 'completed',
-    confirmationCode: 'BO2024ST',
+    confirmationCode: 'ECO2024ST',
     createdAt: '2026-02-15',
   },
 ];
 
 export default function BookingsScreen() {
   const router = useRouter();
-  const { bookings, setBookings, theme } = useStore();
+  const { bookings, theme, apiSettings } = useStore();
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
   const displayBookings = bookings.length > 0 ? bookings : mockBookings;
 
   const isDark = theme === 'dark';
   const dynamicStyles = {
-    container: { backgroundColor: isDark ? '#000000' : Colors.backgroundLight },
-    text: { color: isDark ? '#FFFFFF' : Colors.text },
-    subText: { color: isDark ? '#888888' : Colors.textLight },
-    card: { backgroundColor: isDark ? '#0A0A0A' : Colors.white, borderColor: isDark ? '#1A1A1A' : Colors.border },
+    container: { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
+    text: { color: isDark ? '#FFFFFF' : '#1A1A1A' },
+    subText: { color: isDark ? '#A1A1AA' : '#666666' },
+    card: { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#27272A' : '#F3F4F6' },
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return Colors.success;
-      case 'pending': return Colors.warning;
-      case 'completed': return Colors.secondary;
-      case 'cancelled': return Colors.error;
-      default: return Colors.textMuted;
+      case 'confirmed': return '#10B981';
+      case 'pending': return '#F59E0B';
+      case 'completed': return primaryColor;
+      case 'cancelled': return '#EF4444';
+      default: return '#666666';
     }
   };
 
@@ -64,55 +65,55 @@ export default function BookingsScreen() {
   };
 
   const renderItem = ({ item }: { item: Booking }) => (
-    <TouchableOpacity style={styles.bookingCard}>
-      <View style={styles.bookingImage}>
+    <TouchableOpacity style={[styles.bookingCard, dynamicStyles.card, { borderWidth: 1 }]}>
+      <View style={[styles.bookingImage, { backgroundColor: isDark ? '#18181B' : '#F3F4F6' }]}>
         <Text style={styles.bookingIcon}>✈️</Text>
       </View>
       <View style={styles.bookingContent}>
-        <Text style={styles.bookingName}>{item.destinationName}</Text>
-        <Text style={styles.bookingDate}>Date: {item.date}</Text>
-        <Text style={styles.bookingGuests}>{item.guests} Guest(s)</Text>
+        <Text style={[styles.bookingName, dynamicStyles.text]}>{item.destinationName}</Text>
+        <Text style={[styles.bookingDate, dynamicStyles.subText]}>Date: {item.date}</Text>
+        <Text style={[styles.bookingGuests, dynamicStyles.subText]}>{item.guests} Guest(s)</Text>
         <View style={styles.bookingFooter}>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '15' }]}>
             <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
               {getStatusLabel(item.status)}
             </Text>
           </View>
-          <Text style={styles.bookingPrice}>${item.totalPrice}</Text>
+          <Text style={[styles.bookingPrice, { color: primaryColor }]}>${item.totalPrice.toFixed(2)}</Text>
         </View>
         {item.confirmationCode && (
-          <Text style={styles.confirmationCode}>Code: {item.confirmationCode}</Text>
+          <Text style={[styles.confirmationCode, dynamicStyles.subText]}>Code: {item.confirmationCode}</Text>
         )}
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynamicStyles.container]}>
       <Header title="My Bookings" />
       
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{displayBookings.length}</Text>
-            <Text style={styles.statLabel}>Total Bookings</Text>
+          <View style={[styles.statCard, dynamicStyles.card, { borderWidth: 1 }]}>
+            <Text style={[styles.statNumber, { color: primaryColor }]}>{displayBookings.length}</Text>
+            <Text style={[styles.statLabel, dynamicStyles.subText]}>Total Bookings</Text>
           </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>
+          <View style={[styles.statCard, dynamicStyles.card, { borderWidth: 1 }]}>
+            <Text style={[styles.statNumber, { color: primaryColor }]}>
               {displayBookings.filter(b => b.status === 'confirmed').length}
             </Text>
-            <Text style={styles.statLabel}>Upcoming</Text>
+            <Text style={[styles.statLabel, dynamicStyles.subText]}>Upcoming</Text>
           </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>
+          <View style={[styles.statCard, dynamicStyles.card, { borderWidth: 1 }]}>
+            <Text style={[styles.statNumber, { color: primaryColor }]}>
               {displayBookings.filter(b => b.status === 'completed').length}
             </Text>
-            <Text style={styles.statLabel}>Completed</Text>
+            <Text style={[styles.statLabel, dynamicStyles.subText]}>Completed</Text>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Bookings</Text>
+          <Text style={[styles.sectionTitle, dynamicStyles.text]}>Your Bookings</Text>
         </View>
 
         <FlatList
@@ -126,8 +127,8 @@ export default function BookingsScreen() {
         {displayBookings.length === 0 && (
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>📋</Text>
-            <Text style={styles.emptyText}>No bookings yet</Text>
-            <Text style={styles.emptySubtext}>Book your first trip with Blue Ocean!</Text>
+            <Text style={[styles.emptyText, dynamicStyles.text]}>No bookings yet</Text>
+            <Text style={[styles.emptySubtext, dynamicStyles.subText]}>Book your first trip with ecommerco.ai!</Text>
           </View>
         )}
       </ScrollView>
@@ -138,7 +139,6 @@ export default function BookingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.backgroundLight,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -147,53 +147,46 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 20,
     marginHorizontal: 4,
     alignItems: 'center',
   },
   statNumber: {
     fontSize: 28,
-    fontWeight: '800',
-    color: Colors.primary,
+    fontWeight: '900',
   },
   statLabel: {
-    fontSize: 12,
-    color: Colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
     marginTop: 4,
   },
   section: {
     paddingHorizontal: 20,
-    marginTop: 24,
+    marginTop: 32,
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.text,
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: 0.5,
   },
   list: {
     paddingHorizontal: 20,
     paddingBottom: 100,
   },
   bookingCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 16,
     marginBottom: 16,
     flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
   },
   bookingImage: {
     width: 80,
     height: 80,
-    borderRadius: 16,
-    backgroundColor: Colors.backgroundLight,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -206,60 +199,59 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bookingName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.text,
+    fontSize: 17,
+    fontWeight: '800',
   },
   bookingDate: {
     fontSize: 13,
-    color: Colors.textLight,
     marginTop: 4,
+    fontWeight: '500',
   },
   bookingGuests: {
     fontSize: 13,
-    color: Colors.textLight,
+    fontWeight: '500',
   },
   bookingFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 12,
   },
   statusBadge: {
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
+    textTransform: 'uppercase',
   },
   bookingPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.primary,
+    fontSize: 18,
+    fontWeight: '900',
   },
   confirmationCode: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    marginTop: 4,
+    fontSize: 11,
+    marginTop: 8,
+    fontWeight: '600',
+    letterSpacing: 1,
   },
   empty: {
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
+    fontSize: 64,
+    marginBottom: 20,
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
+    fontSize: 20,
+    fontWeight: '800',
   },
   emptySubtext: {
     fontSize: 14,
-    color: Colors.textMuted,
     marginTop: 8,
+    fontWeight: '500',
   },
 });

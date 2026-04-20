@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
 import { useStore } from '../store';
 import { Logo } from './Logo';
 import { Colors } from '../types';
+import { Ionicons } from '@expo/vector-icons';
 
 interface HeaderProps {
   title?: string;
@@ -18,21 +19,21 @@ export const Header: React.FC<HeaderProps> = ({ title, showBack, onBack }) => {
     <View style={[
       styles.header, 
       { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
-      { borderBottomWidth: 1, borderBottomColor: isDark ? '#111111' : '#F3F4F6' }
+      { borderBottomWidth: 1, borderBottomColor: isDark ? '#111111' : '#F4F4F5' }
     ]}>
       <View style={styles.headerContent}>
         <View style={styles.leftContainer}>
           {showBack && (
-            <TouchableOpacity onPress={onBack} style={[styles.backButton, { backgroundColor: isDark ? '#111111' : '#F3F4F6' }]}>
-              <Text style={[styles.backText, { color: isDark ? '#FFFFFF' : '#111' }]}>←</Text>
+            <TouchableOpacity onPress={onBack} style={[styles.backButton, { backgroundColor: isDark ? '#111111' : '#F4F4F5' }]}>
+              <Ionicons name="arrow-back" size={20} color={isDark ? '#FFFFFF' : '#111827'} />
             </TouchableOpacity>
           )}
           <View style={styles.logoContainer}>
             <Logo size="small" />
             {title && (
               <View style={styles.titleWrapper}>
-                <View style={[styles.titleDivider, { backgroundColor: isDark ? '#222' : '#E5E7EB' }]} />
-                <Text style={[styles.pageTitle, { color: isDark ? '#FFFFFF' : '#111' }]}>{title}</Text>
+                <View style={[styles.titleDivider, { backgroundColor: isDark ? '#222222' : '#E5E7EB' }]} />
+                <Text style={[styles.pageTitle, { color: isDark ? '#FFFFFF' : '#111827' }]}>{title}</Text>
               </View>
             )}
           </View>
@@ -61,26 +62,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChangeText, place
         backgroundColor: '#0A0A0A', 
         borderColor: '#27272A', 
         borderWidth: 1,
-        shadowOpacity: 0,
       } : {
-        backgroundColor: '#FFFFFF',
-        borderColor: '#F3F4F6',
+        backgroundColor: '#F4F4F5',
+        borderColor: '#F4F4F5',
         borderWidth: 1,
-        shadowOpacity: 0.05,
       }
     ]}>
-      <Text style={styles.searchIcon}>🔍</Text>
+      <Ionicons name="search-outline" size={18} color={isDark ? '#71717A' : '#71717A'} style={styles.searchIcon} />
       <TextInput
-        style={[styles.searchInput, isDark && { color: '#FFFFFF' }]}
+        style={[styles.searchInput, { color: isDark ? '#FFFFFF' : '#111827' }]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder || 'Search destinations...'}
-        placeholderTextColor={isDark ? '#52525B' : Colors.textMuted}
+        placeholderTextColor={isDark ? '#52525B' : '#A1A1AA'}
         onSubmitEditing={onSubmit}
       />
       {value.length > 0 && (
         <TouchableOpacity onPress={() => onChangeText('')}>
-          <Text style={styles.clearIcon}>✕</Text>
+          <Ionicons name="close-circle" size={18} color={isDark ? '#52525B' : '#A1A1AA'} />
         </TouchableOpacity>
       )}
     </View>
@@ -120,14 +119,14 @@ export const Button: React.FC<ButtonProps> = ({ title, onPress, variant = 'prima
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <Text style={[textStyles, { fontWeight: '700' }]}>{title}</Text>
+      <Text style={[textStyles, { fontWeight: '800', letterSpacing: 0.5 }]}>{title.toUpperCase()}</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 50,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingBottom: 16,
     width: '100%',
   },
@@ -147,16 +146,12 @@ const styles = StyleSheet.create({
     width: 40,
   },
   backButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
-  },
-  backText: {
-    fontSize: 18,
-    fontWeight: '700',
   },
   logoContainer: {
     flexDirection: 'row',
@@ -171,87 +166,36 @@ const styles = StyleSheet.create({
     height: 20,
     marginHorizontal: 12,
   },
-  logoCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  logoText: {
-    fontSize: 22,
-  },
-  brandName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.white,
-  },
   pageTitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
-  },
-  placeholder: {
-    width: 40,
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.white,
     marginHorizontal: 20,
     marginVertical: 16,
     paddingHorizontal: 16,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    borderRadius: 12,
+    height: 52,
   },
   searchIcon: {
-    fontSize: 18,
     marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: Colors.text,
-  },
-  clearIcon: {
-    fontSize: 16,
-    color: Colors.textMuted,
-    padding: 8,
-  },
-  button: {
-    paddingVertical: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 0,
-    overflow: 'hidden',
-  },
-  buttonPrimary: {
-    backgroundColor: Colors.primary,
-  },
-  buttonSecondary: {
-    backgroundColor: Colors.secondary,
-  },
-  buttonOutline: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: Colors.primary,
-  },
-  buttonDisabled: {
-    backgroundColor: Colors.border,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '600',
   },
-  buttonTextOutline: {
-    color: Colors.primary,
+  button: {
+    paddingVertical: 18,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    fontSize: 15,
   },
 });

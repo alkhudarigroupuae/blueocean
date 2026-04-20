@@ -342,7 +342,7 @@ export default function AdminSettings() {
                 </View>
                 
                 <Text style={styles.helperText}>
-                  This configures the direct handshake between Blue Ocean and {name} servers.
+                  This configures the direct handshake between ecommerco.ai and {name} servers.
                 </Text>
               </View>
             )}

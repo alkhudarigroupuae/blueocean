@@ -180,7 +180,7 @@ export default function DestinationDetailScreen() {
                     </View>
                   </View>
                   <View style={styles.offerRight}>
-                    <Text style={[styles.offerPrice, dynamicStyles.text]}>${offer.price}</Text>
+                    <Text style={[styles.offerPrice, dynamicStyles.text]}>${offer.price.toFixed(2)}</Text>
                     <TouchableOpacity 
                       style={[styles.selectBtn, { borderColor: primaryColor }, offer.price === destination.price && { backgroundColor: primaryColor }]}
                       onPress={() => router.push({ pathname: '/booking/[id]', params: { id: destination.id, provider: offer.provider, price: offer.price.toString() } })}
@@ -214,7 +214,7 @@ export default function DestinationDetailScreen() {
           <View style={[styles.priceSection, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderTopColor: isDark ? '#1A1A1A' : '#F3F4F6' }]}>
             <View style={styles.priceInfo}>
               <Text style={[styles.priceLabel, dynamicStyles.subText]}>Total Price</Text>
-              <Text style={[styles.priceValue, { color: primaryColor }]}>${destination.price}</Text>
+              <Text style={[styles.priceValue, { color: primaryColor }]}>${destination.price.toFixed(2)}</Text>
               <Text style={[styles.priceNote, dynamicStyles.subText]}>per person</Text>
             </View>
             <Button
@@ -247,7 +247,7 @@ export default function DestinationDetailScreen() {
                 </View>
                 <View style={styles.modalOfferRow}>
                   <Text style={[styles.modalOfferLabel, dynamicStyles.subText]}>Price</Text>
-                  <Text style={[styles.modalOfferValue, { color: primaryColor }]}>${selectedOffer.price}</Text>
+                  <Text style={[styles.modalOfferValue, { color: primaryColor }]}>${selectedOffer.price.toFixed(2)}</Text>
                 </View>
                 {selectedOffer.details && (
                   <>

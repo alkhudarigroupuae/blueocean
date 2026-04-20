@@ -65,7 +65,9 @@ export default function ConfirmationScreen() {
         
         <View style={[styles.detailRow, { borderBottomColor: 'transparent' }]}>
           <Text style={[styles.detailLabel, dynamicStyles.subText]}>Total Paid</Text>
-          <Text style={[styles.detailValuePrice, { color: primaryColor }]}>${params.totalPrice || 'N/A'}</Text>
+          <Text style={[styles.detailValuePrice, { color: primaryColor }]}>
+            ${parseFloat(params.totalPrice as string || '0').toFixed(2)}
+          </Text>
         </View>
       </View>
 
