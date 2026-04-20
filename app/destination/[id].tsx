@@ -23,8 +23,8 @@ export default function DestinationDetailScreen() {
   const handleShare = async () => {
     try {
       const result = await Share.share({
-        message: `Check out this amazing trip to ${destination?.name} on ecommerco.ai! 🌊\n\nBook now at: http://localhost:8081/destination/${id}`,
-        url: `http://localhost:8081/destination/${id}`,
+        message: `Check out this amazing trip to ${destination?.name} on ecommerco.ai! 🌊\n\nBook now at: https://ecommerco.ai/destination/${id}`,
+        url: `https://ecommerco.ai/destination/${id}`,
         title: `ecommerco.ai - ${destination?.name}`,
       });
     } catch (error: any) {

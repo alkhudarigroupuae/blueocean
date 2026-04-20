@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { CustomSplashScreen } from '../components/CustomSplashScreen';
+import { useStore } from '../store';
 import { Colors } from '../types';
 
 export default function RootLayout() {
   const [isSplashVisible, setIsSplashVisible] = useState(true);
+  const { theme } = useStore();
+  const isDark = theme === 'dark';
 
   return (
     <>
-      <StatusBar style={isSplashVisible ? "light" : "dark"} />
+      <StatusBar style="light" />
       
       {isSplashVisible && (
         <CustomSplashScreen onFinish={() => setIsSplashVisible(false)} />
@@ -18,7 +21,7 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: Colors.backgroundLight },
+          contentStyle: { backgroundColor: isDark ? '#000000' : Colors.backgroundLight },
         }}
       >
         <Stack.Screen name="(tabs)" />

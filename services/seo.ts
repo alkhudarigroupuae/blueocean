@@ -15,7 +15,7 @@ export const generateTripSchema = (destination: Destination) => {
     "description": destination.description,
     "brand": {
       "@type": "Brand",
-      "name": "Alkhudari Group"
+      "name": "ecommerco.ai"
     },
     "offers": {
       "@type": "AggregateOffer",
@@ -37,12 +37,12 @@ export const SEO_CONFIG = {
   robotsTxt: `
     User-agent: *
     Allow: /
-    Sitemap: https://travel.alkhudarigroup.com/sitemap.xml
+    Sitemap: https://ecommerco.ai/sitemap.xml
   `,
   metaTags: {
     home: {
-      title: "Alkhudari Group | Imperial Travel & Booking Hub",
-      description: "Book exclusive flights and packages via travel.alkhudarigroup.com. The leading travel brokerage platform."
+      title: "ecommerco.ai | Imperial Enterprise SaaS & Brokerage",
+      description: "The world's leading enterprise travel brokerage platform. Real-time handshake, zero-compute architecture."
     }
   }
 };
