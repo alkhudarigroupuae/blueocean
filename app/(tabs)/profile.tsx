@@ -1,19 +1,58 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Switch } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Switch, Modal, TextInput } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Header } from '../../components/Header';
 import { useStore } from '../../store';
+import { Logo } from '../../components/Logo';
+import { translations } from '../../services/translations';
 import { Colors } from '../../types';
 
 export default function ProfileScreen() {
-  const { user } = useStore();
+  const router = useRouter();
+  const { user, setUser, language, setLanguage, theme, setTheme } = useStore();
   const [notifications, setNotifications] = React.useState(true);
+  
+  const isDark = theme === 'dark';
+  const dynamicStyles = {
+    container: { backgroundColor: isDark ? '#000000' : Colors.backgroundLight },
+    text: { color: isDark ? '#FFFFFF' : Colors.text },
+    subText: { color: isDark ? '#888888' : Colors.textLight },
+    card: { backgroundColor: isDark ? '#0A0A0A' : Colors.white, borderColor: isDark ? '#1A1A1A' : Colors.border },
+    header: { backgroundColor: isDark ? '#0A0A0A' : Colors.white },
+  };
+
+  // Translation Helper
+  const t = translations[language];
+
+  // Language Modal State
+  const [isLanguageModalVisible, setIsLanguageModalVisible] = React.useState(false);
+  
+  // Edit Profile States
+  const [isEditModalVisible, setIsEditModalVisible] = React.useState(false);
+  const [editName, setEditName] = React.useState(user?.name || '');
+  const [editEmail, setEditEmail] = React.useState(user?.email || '');
+
+  const handleUpdateProfile = () => {
+    setUser({ ...user!, name: editName, email: editEmail });
+    setIsEditModalVisible(false);
+  };
+
+  const languages = [
+    { code: 'ar', name: 'العربية', flag: '🇦🇪' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  ];
 
   const menuItems = [
-    { icon: '👤', title: 'Edit Profile', onPress: () => {} },
-    { icon: '💳', title: 'Payment Methods', onPress: () => {} },
+    { icon: '👤', title: t.editProfile, onPress: () => setIsEditModalVisible(true) },
+    { icon: isDark ? '☀️' : '🌙', title: isDark ? 'Day Mode' : 'Night Mode', onPress: () => setTheme(isDark ? 'light' : 'dark') },
+    { icon: '💳', title: 'Payment Methods', onPress: () => router.push('/profile/payments') },
     { icon: '🔔', title: 'Notifications', onPress: () => {}, hasSwitch: true },
-    { icon: '🌐', title: 'Language', onPress: () => {}, right: 'English' },
+    { icon: '🌐', title: t.language, onPress: () => setIsLanguageModalVisible(true), right: languages.find(l => l.code === language)?.name },
     { icon: '💰', title: 'Currency', onPress: () => {}, right: 'USD' },
+    { icon: '🏢', title: t.adminDashboard, onPress: () => router.push('/admin'), textColor: '#FFD400' },
     { icon: '❓', title: 'Help & Support', onPress: () => {} },
     { icon: '📜', title: 'Terms & Conditions', onPress: () => {} },
     { icon: '🔒', title: 'Privacy Policy', onPress: () => {} },
@@ -21,7 +60,7 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynamicStyles.container]}>
       <Header title="Profile" />
       
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -35,51 +74,45 @@ export default function ProfileScreen() {
               <Text style={styles.editAvatarText}>✏️</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.userName}>{user?.name || 'Blue Ocean User'}</Text>
-          <Text style={styles.userEmail}>{user?.email || 'user@blueocean.com'}</Text>
+          <Text style={[styles.userName, dynamicStyles.text]}>{user?.name || 'Blue Ocean User'}</Text>
+          <Text style={[styles.userEmail, dynamicStyles.subText]}>{user?.email || 'user@blueocean.com'}</Text>
         </View>
 
         {/* Stats */}
-        <View style={styles.statsContainer}>
+        <View style={[styles.statsContainer, dynamicStyles.card]}>
           <View style={styles.statItem}>
             <Text style={styles.statValue}>12</Text>
-            <Text style={styles.statLabel}>Trips</Text>
+            <Text style={[styles.statLabel, dynamicStyles.subText]}>Trips</Text>
           </View>
-          <View style={styles.statDivider} />
+          <View style={[styles.statDivider, { backgroundColor: isDark ? '#1A1A1A' : Colors.border }]} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>5</Text>
-            <Text style={styles.statLabel}>Countries</Text>
+            <Text style={[styles.statLabel, dynamicStyles.subText]}>Countries</Text>
           </View>
-          <View style={styles.statDivider} />
+          <View style={[styles.statDivider, { backgroundColor: isDark ? '#1A1A1A' : Colors.border }]} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>8</Text>
-            <Text style={styles.statLabel}>Reviews</Text>
+            <Text style={[styles.statLabel, dynamicStyles.subText]}>Reviews</Text>
           </View>
         </View>
 
-        {/* Blue Ocean Brand Section */}
-        <View style={styles.brandCard}>
-          <View style={styles.brandContent}>
-            <Text style={styles.brandEmoji}>🌊</Text>
-            <View style={styles.brandText}>
-              <Text style={styles.brandTitle}>Blue Ocean</Text>
-              <Text style={styles.brandSubtitle}>Travel & Booking</Text>
-            </View>
-          </View>
-          <Text style={styles.brandTagline}>Your journey begins with us</Text>
+        {/* Alkhudari Brand Section */}
+        <View style={[styles.brandCard, dynamicStyles.card, { alignItems: 'center', backgroundColor: isDark ? '#0A0A0A' : '#F9FAFB' }]}>
+          <Logo size="large" />
+          <Text style={[styles.brandTagline, dynamicStyles.subText, { marginTop: 10 }]}>Imperial Travel & Brokerage Platform</Text>
         </View>
 
         {/* Menu Items */}
-        <View style={styles.menuSection}>
+        <View style={[styles.menuSection, dynamicStyles.card]}>
           {menuItems.map((item, index) => (
             <TouchableOpacity 
               key={index} 
-              style={styles.menuItem}
+              style={[styles.menuItem, { borderBottomColor: isDark ? '#1A1A1A' : Colors.border }]}
               onPress={item.onPress}
             >
               <View style={styles.menuLeft}>
                 <Text style={styles.menuIcon}>{item.icon}</Text>
-                <Text style={[styles.menuTitle, item.textColor && { color: item.textColor }]}>
+                <Text style={[styles.menuTitle, dynamicStyles.text, item.textColor && { color: item.textColor }]}>
                   {item.title}
                 </Text>
               </View>
@@ -87,12 +120,12 @@ export default function ProfileScreen() {
                 <Switch
                   value={notifications}
                   onValueChange={setNotifications}
-                  trackColor={{ false: Colors.border, true: Colors.primary }}
+                  trackColor={{ false: isDark ? '#222' : Colors.border, true: Colors.primary }}
                 />
               ) : (
                 <View style={styles.menuRight}>
-                  {item.right && <Text style={styles.menuRightText}>{item.right}</Text>}
-                  <Text style={styles.chevron}>›</Text>
+                  {item.right && <Text style={[styles.menuRightText, dynamicStyles.subText]}>{item.right}</Text>}
+                  <Text style={[styles.chevron, dynamicStyles.subText]}>›</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -100,9 +133,93 @@ export default function ProfileScreen() {
         </View>
 
         {/* App Version */}
-        <Text style={styles.version}>Blue Ocean v1.0.0</Text>
+        <Text style={[styles.version, dynamicStyles.subText]}>Blue Ocean v1.0.0</Text>
         <View style={styles.bottomPadding} />
       </ScrollView>
+
+      {/* Language Selection Modal */}
+      <Modal
+        visible={isLanguageModalVisible}
+        animationType="slide"
+        transparent
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, dynamicStyles.card]}>
+            <View style={[styles.modalHeader, dynamicStyles.header]}>
+              <Text style={[styles.modalTitle, dynamicStyles.text]}>{t.selectLanguage}</Text>
+              <TouchableOpacity onPress={() => setIsLanguageModalVisible(false)}>
+                <Text style={[styles.closeIcon, dynamicStyles.text]}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalBody}>
+              {languages.map((lang) => (
+                <TouchableOpacity 
+                  key={lang.code} 
+                  style={[styles.languageItem, language === lang.code && styles.activeLanguageItem, { borderColor: isDark ? '#1A1A1A' : Colors.border }]}
+                  onPress={() => {
+                    setLanguage(lang.code as any);
+                    setIsLanguageModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.languageFlag}>{lang.flag}</Text>
+                  <Text style={[styles.languageName, dynamicStyles.text, language === lang.code && styles.activeLanguageName]}>
+                    {lang.name}
+                  </Text>
+                  {language === lang.code && <Text style={styles.checkIcon}>✓</Text>}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Edit Profile Modal */}
+      <Modal
+        visible={isEditModalVisible}
+        animationType="slide"
+        transparent
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, dynamicStyles.card]}>
+            <View style={[styles.modalHeader, dynamicStyles.header]}>
+              <Text style={[styles.modalTitle, dynamicStyles.text]}>{t.editProfile}</Text>
+              <TouchableOpacity onPress={() => setIsEditModalVisible(false)}>
+                <Text style={[styles.closeIcon, dynamicStyles.text]}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, dynamicStyles.text]}>Full Name</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: isDark ? '#000' : Colors.backgroundLight, color: isDark ? '#FFF' : Colors.text, borderColor: isDark ? '#1A1A1A' : Colors.border }]}
+                  value={editName}
+                  onChangeText={setEditName}
+                  placeholder="Enter your name"
+                  placeholderTextColor={isDark ? '#444' : '#999'}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, dynamicStyles.text]}>Email Address</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: isDark ? '#000' : Colors.backgroundLight, color: isDark ? '#FFF' : Colors.text, borderColor: isDark ? '#1A1A1A' : Colors.border }]}
+                  value={editEmail}
+                  onChangeText={setEditEmail}
+                  placeholder="Enter your email"
+                  placeholderTextColor={isDark ? '#444' : '#999'}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <TouchableOpacity style={styles.saveBtn} onPress={handleUpdateProfile}>
+                <Text style={styles.saveBtnText}>{t.saveChanges}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -261,11 +378,104 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: Colors.textMuted,
   },
+  saveBtn: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  saveBtnText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  languageItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  activeLanguageItem: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '05',
+  },
+  languageFlag: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  languageName: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.text,
+    fontWeight: '600',
+  },
+  activeLanguageName: {
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  checkIcon: {
+    color: Colors.primary,
+    fontSize: 18,
+    fontWeight: '800',
+  },
   version: {
     textAlign: 'center',
     color: Colors.textMuted,
     fontSize: 12,
     marginTop: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: 40,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: Colors.text,
+  },
+  closeIcon: {
+    fontSize: 20,
+    color: Colors.textLight,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: Colors.backgroundLight,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    color: Colors.text,
   },
   bottomPadding: {
     height: 100,

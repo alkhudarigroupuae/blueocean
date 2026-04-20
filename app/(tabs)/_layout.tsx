@@ -1,47 +1,65 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useStore } from '../../store';
 import { Colors } from '../../types';
 
-function TabIcon({ icon, label, focused }: { icon: string; label: string; focused: boolean }) {
+function TabIcon({ name, label, focused }: { name: any; label: string; focused: boolean }) {
+  const { theme } = useStore();
+  const isDark = theme === 'dark';
+
   return (
     <View style={styles.tabItem}>
-      <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>{icon}</Text>
-      <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{label}</Text>
+      <Ionicons 
+        name={name} 
+        size={24} 
+        color={focused ? Colors.primary : (isDark ? '#444' : '#999')} 
+      />
+      <Text style={[
+        styles.tabLabel, 
+        focused && styles.tabLabelActive,
+        isDark && { color: focused ? Colors.primary : '#444' }
+      ]}>
+        {label}
+      </Text>
     </View>
   );
 }
 
 export default function TabLayout() {
+  const { theme } = useStore();
+  const isDark = theme === 'dark';
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, isDark && { backgroundColor: '#0A0A0A', borderTopColor: '#1A1A1A' }],
         tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon icon="🏠" label="Home" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "home" : "home-outline"} label="Home" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon icon="🔍" label="Search" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "search" : "search-outline"} label="Search" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="bookings"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon icon="📋" label="Bookings" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "list" : "list-outline"} label="Bookings" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon icon="👤" label="Profile" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "person" : "person-outline"} label="Profile" focused={focused} />,
         }}
       />
     </Tabs>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { useStore } from '../store';
 import { Destination, Colors } from '../types';
 
 interface DestinationCardProps {
@@ -8,19 +9,30 @@ interface DestinationCardProps {
 }
 
 export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, onPress }) => {
+  const { theme } = useStore();
+  const isDark = theme === 'dark';
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity style={[styles.card, isDark && { backgroundColor: '#0A0A0A', borderColor: '#1A1A1A' }]} onPress={onPress} activeOpacity={0.9}>
       <Image source={{ uri: destination.image }} style={styles.image} />
       <View style={styles.overlay}>
         <View style={styles.content}>
-          <View style={styles.ratingContainer}>
+          <View style={[styles.ratingContainer, isDark && { backgroundColor: 'rgba(0,0,0,0.8)' }]}>
             <Text style={styles.rating}>★ {destination.rating}</Text>
           </View>
           <Text style={styles.name}>{destination.name}</Text>
           <Text style={styles.location}>{destination.country}</Text>
           <View style={styles.priceTag}>
-            <Text style={styles.priceLabel}>From</Text>
-            <Text style={styles.price}>${destination.price}</Text>
+            <View>
+              <Text style={styles.priceLabel}>Starting from</Text>
+              <Text style={styles.price}>${destination.price}</Text>
+            </View>
+            {destination.highestPrice && (
+              <View style={[styles.highestPriceContainer, isDark && { borderLeftColor: '#333' }]}>
+                <Text style={styles.highestPriceLabel}>Up to</Text>
+                <Text style={styles.highestPrice}>${destination.highestPrice}</Text>
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -87,5 +99,21 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: Colors.white,
+  },
+  highestPriceContainer: {
+    marginLeft: 16,
+    borderLeftWidth: 1,
+    borderLeftColor: 'rgba(255,255,255,0.3)',
+    paddingLeft: 16,
+  },
+  highestPriceLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  highestPrice: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+    textDecorationLine: 'line-through',
   },
 });

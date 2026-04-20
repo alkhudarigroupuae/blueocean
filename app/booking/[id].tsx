@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Header, Button } from '../../components/Header';
+import { useStore } from '../../store';
 import { sampleDestinations } from '../../services/api';
 import { Colors, PaymentInfo } from '../../types';
 
 export default function BookingScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
+  const { id, provider, price } = useLocalSearchParams();
+  const { addBooking } = useStore();
   const destination = sampleDestinations.find(d => d.id === id);
 
   const [guests, setGuests] = useState(2);
+  const selectedPrice = price ? parseInt(price as string) : (destination?.price || 0);
+  const selectedProvider = (provider as string) || 'Blue Ocean Standard';
+  
   const [date, setDate] = useState('2026-06-15');
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
     cardNumber: '',
@@ -20,7 +25,7 @@ export default function BookingScreen() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const totalPrice = destination ? destination.price * guests : 0;
+  const totalPrice = selectedPrice * guests;
 
   const handlePayment = async () => {
     if (!paymentInfo.cardNumber || !paymentInfo.cardHolder || !paymentInfo.expiryDate || !paymentInfo.cvv) {
@@ -32,15 +37,33 @@ export default function BookingScreen() {
 
     // Simulate payment processing
     setTimeout(() => {
+      const confirmationCode = 'BO' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      // Add to store
+      if (destination) {
+        addBooking({
+          id: Math.random().toString(36).substring(7),
+          destinationId: destination.id,
+          destinationName: `${destination.name} (${selectedProvider})`,
+          date,
+          guests,
+          totalPrice,
+          status: 'confirmed',
+          confirmationCode,
+          createdAt: new Date().toISOString().split('T')[0],
+        });
+      }
+
       setIsProcessing(false);
       router.replace({
         pathname: '/confirmation',
         params: { 
           destinationId: destination?.id,
-          destinationName: destination?.name,
+          destinationName: `${destination?.name} via ${selectedProvider}`,
           guests: guests.toString(),
           date,
           totalPrice: totalPrice.toString(),
+          confirmationCode,
         }
       });
     }, 2000);
@@ -67,7 +90,7 @@ export default function BookingScreen() {
           <Image source={{ uri: destination.image }} style={styles.summaryImage} />
           <View style={styles.summaryContent}>
             <Text style={styles.summaryName}>{destination.name}</Text>
-            <Text style={styles.summaryLocation}>{destination.country}</Text>
+            <Text style={styles.summaryLocation}>{destination.country} · {selectedProvider}</Text>
             <Text style={styles.summaryDuration}>{destination.duration}</Text>
           </View>
         </View>

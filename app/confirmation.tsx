@@ -6,13 +6,7 @@ import { Colors } from '../types';
 export default function ConfirmationScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const [confirmationCode, setConfirmationCode] = useState('');
-
-  useEffect(() => {
-    // Generate a unique confirmation code
-    const code = 'BO' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    setConfirmationCode(code);
-  }, []);
+  const confirmationCode = (params.confirmationCode as string) || 'BO-UNKNOWN';
 
   const handleDone = () => {
     // Navigate to the bookings tab

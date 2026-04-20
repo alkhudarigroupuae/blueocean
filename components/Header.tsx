@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useStore } from '../store';
+import { Logo } from './Logo';
 import { Colors } from '../types';
 
 interface HeaderProps {
@@ -9,22 +11,25 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ title, showBack, onBack }) => {
+  const { theme } = useStore();
+  const isDark = theme === 'dark';
+
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, isDark && { backgroundColor: '#0A0A0A', borderBottomWidth: 1, borderBottomColor: '#1A1A1A' }]}>
       <View style={styles.headerContent}>
         {showBack && (
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Text style={styles.backText}>←</Text>
+          <TouchableOpacity onPress={onBack} style={[styles.backButton, isDark && { backgroundColor: '#1A1A1A' }]}>
+            <Text style={[styles.backText, isDark && { color: '#FFFFFF' }]}>←</Text>
           </TouchableOpacity>
         )}
         <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>🌊</Text>
-          </View>
-          <View>
-            <Text style={styles.brandName}>Blue Ocean</Text>
-            {title && <Text style={styles.pageTitle}>{title}</Text>}
-          </View>
+          <Logo size="small" />
+          {title && (
+            <View style={styles.titleWrapper}>
+              <View style={[styles.titleDivider, { backgroundColor: isDark ? '#333' : '#E5E7EB' }]} />
+              <Text style={[styles.pageTitle, isDark && { color: '#ed7430' }]}>{title}</Text>
+            </View>
+          )}
         </View>
         <View style={styles.placeholder} />
       </View>
@@ -40,15 +45,18 @@ interface SearchBarProps {
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({ value, onChangeText, placeholder, onSubmit }) => {
+  const { theme } = useStore();
+  const isDark = theme === 'dark';
+
   return (
-    <View style={styles.searchContainer}>
+    <View style={[styles.searchContainer, isDark && { backgroundColor: '#0A0A0A', borderColor: '#1A1A1A' }]}>
       <Text style={styles.searchIcon}>🔍</Text>
       <TextInput
-        style={styles.searchInput}
+        style={[styles.searchInput, isDark && { color: '#FFFFFF' }]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder || 'Search destinations...'}
-        placeholderTextColor={Colors.textMuted}
+        placeholderTextColor={isDark ? '#444' : Colors.textMuted}
         onSubmitEditing={onSubmit}
       />
       {value.length > 0 && (
@@ -117,6 +125,15 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  titleWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleDivider: {
+    width: 1,
+    height: 24,
+    marginHorizontal: 12,
   },
   logoCircle: {
     width: 40,
