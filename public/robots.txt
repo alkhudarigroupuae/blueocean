@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /booking/
 
-Sitemap: https://booking.alkhudarigroup.com/sitemap.xml
+Sitemap: https://travel.alkhudarigroup.com/sitemap.xml

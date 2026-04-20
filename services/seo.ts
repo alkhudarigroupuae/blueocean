@@ -37,12 +37,12 @@ export const SEO_CONFIG = {
   robotsTxt: `
     User-agent: *
     Allow: /
-    Sitemap: https://booking.alkhudarigroup.com/sitemap.xml
+    Sitemap: https://travel.alkhudarigroup.com/sitemap.xml
   `,
   metaTags: {
     home: {
       title: "Alkhudari Group | Imperial Travel & Booking Hub",
-      description: "Book exclusive flights and packages via booking.alkhudarigroup.com. The leading travel brokerage platform."
+      description: "Book exclusive flights and packages via travel.alkhudarigroup.com. The leading travel brokerage platform."
     }
   }
 };
