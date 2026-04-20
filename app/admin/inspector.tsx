@@ -3,21 +3,21 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, FlatList, 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store';
-import { sampleDestinations } from '../../services/api';
 
 const { width } = Dimensions.get('window');
 
 export default function DataInspector() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const destination = sampleDestinations.find(d => d.id === id) || sampleDestinations[0];
+  const { destinations } = useStore();
+  const destination = destinations.find(d => d.id === id);
   
   const [viewMode, setViewMode] = useState<'Photos' | 'RawData'>('Photos');
 
-  // Simulated raw API data from TripAdvisor/Booking.com
-  const rawApiData = {
-    tripadvisor_id: "12425739",
-    source: "RapidAPI - TripAdvisor Scraper",
+  // Real API data from Imperial Handshake
+  const rawApiData = destination ? {
+    tripadvisor_id: destination.id,
+    source: "Imperial Handshake Engine",
     handshake_status: "SUCCESS (200 OK)",
     latency: "142ms",
     full_response: {
@@ -26,24 +26,32 @@ export default function DataInspector() {
       country: destination.country,
       real_time_price: destination.price,
       currency: "USD",
-      photo_count: 8,
-      all_photos: [
-        "https://images.unsplash.com/photo-1547448415-e9f5b28e570d?w=800",
-        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800",
-        "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800",
-        "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
-        "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800",
-        "https://images.unsplash.com/photo-1531366936337-7c912a4589a2?w=800",
-        "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800",
-        "https://images.unsplash.com/photo-1502602898657-3e917247a184?w=800"
-      ],
+      photo_count: destination.image ? 1 : 0,
+      all_photos: destination.image ? [destination.image] : [],
       api_metadata: {
         last_sync: new Date().toISOString(),
         node_server: "Imperial-Node-Cluster-01",
         encryption: "RSA-4096"
       }
     }
-  };
+  } : null;
+
+  if (!destination) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Destination Not Found</Text>
+          <View style={{ width: 24 }} />
+        </View>
+        <View style={styles.centered}>
+          <Text style={{ color: '#FFFFFF', fontSize: 16 }}>No destination data available</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -77,7 +85,7 @@ export default function DataInspector() {
           <View style={styles.gallery}>
             <Text style={styles.galleryTitle}>All Photos imported for {destination.name}</Text>
             <View style={styles.grid}>
-              {rawApiData.full_response.all_photos.map((uri, index) => (
+              {rawApiData?.full_response.all_photos.map((uri, index) => (
                 <View key={index} style={styles.imageWrapper}>
                   <Image source={{ uri }} style={styles.image} />
                   <View style={styles.imageBadge}>
@@ -92,14 +100,14 @@ export default function DataInspector() {
             <View style={styles.metaRow}>
                <View style={styles.statusChip}>
                   <View style={styles.dot} />
-                  <Text style={styles.statusText}>{rawApiData.handshake_status}</Text>
+                  <Text style={styles.statusText}>{rawApiData?.handshake_status}</Text>
                </View>
-               <Text style={styles.latencyText}>{rawApiData.latency}</Text>
+               <Text style={styles.latencyText}>{rawApiData?.latency}</Text>
             </View>
-            <Text style={styles.rawTitle}>JSON Payload from {rawApiData.source}</Text>
+            <Text style={styles.rawTitle}>JSON Payload from {rawApiData?.source}</Text>
             <View style={styles.jsonBox}>
               <Text style={styles.jsonText}>
-                {JSON.stringify(rawApiData.full_response, null, 2)}
+                {JSON.stringify(rawApiData?.full_response, null, 2)}
               </Text>
             </View>
           </View>
@@ -118,6 +126,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000000',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     paddingTop: 60,

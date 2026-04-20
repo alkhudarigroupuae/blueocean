@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, SearchBar } from '../../components/Header';
 import { useStore } from '../../store';
-import { searchFlights, sampleDestinations, getFeaturedDestinations } from '../../services/api';
+import { searchFlights, getFeaturedDestinations } from '../../services/api';
 import { Colors, Destination } from '../../types';
 
 export default function SearchScreen() {
@@ -42,7 +42,7 @@ export default function SearchScreen() {
 
   useEffect(() => {
     if (searchQuery.length > 0) {
-      const filteredSuggestions = sampleDestinations.filter(d =>
+      const filteredSuggestions = destinations.filter(d =>
         d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         d.country.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -52,7 +52,7 @@ export default function SearchScreen() {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, destinations]);
 
   const handleSuggestionPress = (destination: Destination) => {
     setSearchQuery(destination.name);
@@ -69,8 +69,7 @@ export default function SearchScreen() {
       if (searchQuery.length > 0) {
         data = await searchFlights('DXB', searchQuery, apiSettings.branding.companyName);
       } else {
-        const featured = await getFeaturedDestinations();
-        data = featured.length > 0 ? featured : sampleDestinations;
+        data = await getFeaturedDestinations();
       }
 
       // Apply Advanced Filters

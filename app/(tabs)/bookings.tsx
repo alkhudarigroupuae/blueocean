@@ -5,36 +5,13 @@ import { Header } from '../../components/Header';
 import { useStore } from '../../store';
 import { Colors, Booking } from '../../types';
 
-const mockBookings: Booking[] = [
-  {
-    id: '1',
-    destinationId: '1',
-    destinationName: 'Maldives Paradise',
-    date: '2026-05-15',
-    guests: 2,
-    totalPrice: 4998,
-    status: 'confirmed',
-    confirmationCode: 'ECO2024MN',
-    createdAt: '2026-04-01',
-  },
-  {
-    id: '2',
-    destinationId: '3',
-    destinationName: 'Santorini Escape',
-    date: '2026-03-20',
-    guests: 2,
-    totalPrice: 3798,
-    status: 'completed',
-    confirmationCode: 'ECO2024ST',
-    createdAt: '2026-02-15',
-  },
-];
+const mockBookings: Booking[] = [];
 
 export default function BookingsScreen() {
   const router = useRouter();
   const { bookings, theme, apiSettings } = useStore();
   const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
-  const displayBookings = bookings.length > 0 ? bookings : mockBookings;
+  const displayBookings = bookings;
 
   const isDark = theme === 'dark';
   const dynamicStyles = {

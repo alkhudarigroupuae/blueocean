@@ -75,30 +75,30 @@ export default function ProfileScreen() {
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>BO</Text>
+              <Text style={styles.avatarText}>EU</Text>
             </View>
             <TouchableOpacity style={styles.editAvatar}>
               <Text style={styles.editAvatarText}>✏️</Text>
             </TouchableOpacity>
           </View>
-          <Text style={[styles.userName, dynamicStyles.text]}>{user?.name || 'Imperial User'}</Text>
-          <Text style={[styles.userEmail, dynamicStyles.subText]}>{user?.email || 'user@ecommerco.ai'}</Text>
+          <Text style={[styles.userName, dynamicStyles.text]}>{user?.name || ''}</Text>
+          <Text style={[styles.userEmail, dynamicStyles.subText]}>{user?.email || ''}</Text>
         </View>
 
         {/* Stats */}
         <View style={[styles.statsContainer, dynamicStyles.card]}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statValue}>0</Text>
             <Text style={[styles.statLabel, dynamicStyles.subText]}>Trips</Text>
           </View>
           <View style={[styles.statDivider, { backgroundColor: isDark ? '#1A1A1A' : Colors.border }]} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>5</Text>
+            <Text style={styles.statValue}>0</Text>
             <Text style={[styles.statLabel, dynamicStyles.subText]}>Countries</Text>
           </View>
           <View style={[styles.statDivider, { backgroundColor: isDark ? '#1A1A1A' : Colors.border }]} />
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>8</Text>
+            <Text style={styles.statValue}>0</Text>
             <Text style={[styles.statLabel, dynamicStyles.subText]}>Reviews</Text>
           </View>
         </View>

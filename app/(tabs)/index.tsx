@@ -7,7 +7,7 @@ import { Logo } from '../../components/Logo';
 import { DestinationCard } from '../../components/DestinationCard';
 import { Header, SearchBar } from '../../components/Header';
 import { useStore } from '../../store';
-import { getFeaturedDestinations, sampleDestinations, searchFlights } from '../../services/api';
+import { getFeaturedDestinations, searchFlights } from '../../services/api';
 import { SEO_CONFIG } from '../../services/seo';
 import { Colors, Destination } from '../../types';
 
@@ -93,7 +93,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (searchQuery.length > 0) {
-      const filteredSuggestions = sampleDestinations.filter(d =>
+      const filteredSuggestions = destinations.filter((d: Destination) =>
         d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         d.country.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -103,7 +103,7 @@ export default function HomeScreen() {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, destinations]);
 
   const handleSuggestionPress = (destination: Destination) => {
     setSearchQuery(destination.name);

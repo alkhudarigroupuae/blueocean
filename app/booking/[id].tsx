@@ -4,7 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, Button } from '../../components/Header';
 import { useStore } from '../../store';
-import { sampleDestinations } from '../../services/api';
+
 import { Colors, PaymentInfo } from '../../types';
 
 export default function BookingScreen() {
@@ -14,8 +14,8 @@ export default function BookingScreen() {
   const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
   const isDark = theme === 'dark';
   
-  // Look in global store first, then fallback to sampleDestinations
-  const destination = destinations.find(d => d.id === id) || sampleDestinations.find(d => d.id === id);
+  // Look in global store first
+  const destination = destinations.find(d => d.id === id);
 
   const { paymentGateways } = apiSettings;
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'paypal' | 'applePay' | 'googlePay' | 'crypto'>(

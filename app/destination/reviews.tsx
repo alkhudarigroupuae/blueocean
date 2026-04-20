@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Header } from '../../components/Header';
-import { getDestinationReviews, sampleDestinations } from '../../services/api';
+import { getDestinationReviews } from '../../services/api';
+import { useStore } from '../../store';
 import { Colors, Review } from '../../types';
 
 export default function ReviewsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const { destinations } = useStore();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const destination = sampleDestinations.find(d => d.id === id);
+  const destination = destinations.find(d => d.id === id);
 
   useEffect(() => {
     const fetchReviews = async () => {

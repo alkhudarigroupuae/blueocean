@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Dimensions
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import { Header, Button } from '../../components/Header';
-import { sampleDestinations } from '../../services/api';
+
 import { generateTripSchema } from '../../services/seo';
 import { useStore } from '../../store';
 import { Colors, PriceOffer } from '../../types';
@@ -17,9 +17,9 @@ export default function DestinationDetailScreen() {
   const isDark = theme === 'dark';
   const { id } = useLocalSearchParams();
   
-  const [loading, setLoading] = useState(!destinations.length && !sampleDestinations.find(d => d.id === id));
+  const [loading, setLoading] = useState(!destinations.length);
   const [activeDestination, setActiveDestination] = useState<Destination | undefined>(
-    destinations.find(d => d.id === id) || sampleDestinations.find(d => d.id === id)
+    destinations.find(d => d.id === id)
   );
 
   useEffect(() => {
