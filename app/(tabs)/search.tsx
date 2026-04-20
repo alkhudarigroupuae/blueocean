@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Modal, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Modal, RefreshControl, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Header, SearchBar } from '../../components/Header';
@@ -10,12 +10,16 @@ import { Colors, Destination } from '../../types';
 export default function SearchScreen() {
   const router = useRouter();
   const { searchQuery, setSearchQuery, theme, apiSettings } = useStore();
-  const [results, setResults] = useState<Destination[]>(sampleDestinations);
+  const [results, setResults] = useState<Destination[]>([]);
+  const [visibleResults, setVisibleResults] = useState<Destination[]>([]);
+  const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<'low' | 'high'>('low');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [suggestions, setSuggestions] = useState<Destination[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  const ITEMS_PER_PAGE = 20;
   
   const isDark = theme === 'dark';
   const dynamicStyles = {
@@ -80,6 +84,8 @@ export default function SearchScreen() {
       });
 
       setResults(sorted);
+      setPage(1);
+      setVisibleResults(sorted.slice(0, ITEMS_PER_PAGE));
     } catch (error) {
       console.error(error);
     } finally {
@@ -98,6 +104,15 @@ export default function SearchScreen() {
 
   const handleDestinationPress = (id: string) => {
     router.push(`/destination/${id}`);
+  };
+
+  const loadMore = () => {
+    if (visibleResults.length < results.length) {
+      const nextPage = page + 1;
+      const nextBatch = results.slice(0, nextPage * ITEMS_PER_PAGE);
+      setVisibleResults(nextBatch);
+      setPage(nextPage);
+    }
   };
 
   const renderItem = ({ item }: { item: Destination }) => (
@@ -260,14 +275,18 @@ export default function SearchScreen() {
       </Modal>
 
       <FlatList
-        data={results}
+        data={visibleResults}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        initialNumToRender={5}
-        maxToRenderPerBatch={5}
-        windowSize={10}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={() => (
+          isLoading ? <ActivityIndicator size="small" color={Colors.primary} style={{ margin: 20 }} /> : null
+        )}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { cacheData, getCachedData } from './cache';
 import { Destination, Booking, BookingRequest, Review } from '../types';
 
 const API_KEY = process.env.EXPO_PUBLIC_RAPID_API_KEY || '6f2fcbc34fmsh738b32a4809cc60p13f140jsnb1110a344209';
@@ -66,97 +66,113 @@ export const getDestinationReviews = async (locationId: string): Promise<Review[
 };
 
 // Sample destinations data (for demo when API unavailable)
+// Updated Sample Data with fixed clean URLs to avoid ORB issues
 export const sampleDestinations: Destination[] = [
   {
     id: '1',
-    name: 'Dubai to Beirut',
-    country: 'Lebanon',
-    image: 'https://images.unsplash.com/photo-1590076214537-1e3c7c996e41?auto=format&fit=crop&w=800&q=80', // Correct Beirut Image (Raouche Rocks)
-    price: 350,
-    highestPrice: 850,
-    rating: 4.8,
-    reviewCount: 2450,
-    description: 'Travel from the futuristic city of Dubai to the historical and vibrant city of Beirut. Compare prices from top airlines and booking providers.',
-    duration: '4 Hours Flight',
-    highlights: ['Direct flights', 'City tour included', 'Hotel options', 'Beach access'],
-    offers: [
-      { id: 'o1', provider: 'Middle East Airlines', price: 420, type: 'Flight', details: { flightNo: 'ME426', stops: 0, baggage: '30kg', cabin: 'Economy', departureTime: '08:00', arrivalTime: '12:00' } },
-      { id: 'o2', provider: 'Emirates', price: 850, type: 'Flight', details: { flightNo: 'EK957', stops: 0, baggage: '35kg', cabin: 'Business', departureTime: '14:30', arrivalTime: '18:30' } },
-      { id: 'o3', provider: 'Fly Dubai', price: 350, type: 'Flight', details: { flightNo: 'FZ159', stops: 0, baggage: '20kg', cabin: 'Economy', departureTime: '22:15', arrivalTime: '02:15' } },
-      { id: 'o4', provider: 'Booking.com', price: 580, type: 'Package', details: { baggage: '25kg', cabin: 'Economy' } },
-      { id: 'o5', provider: 'Qatar Airways', price: 610, type: 'Flight', details: { flightNo: 'QR107', stops: 1, baggage: '30kg', cabin: 'Economy', departureTime: '11:00', arrivalTime: '17:00' } },
-      { id: 'o6', provider: 'Turkish Airlines', price: 490, type: 'Flight', details: { flightNo: 'TK783', stops: 1, baggage: '30kg', cabin: 'Economy', departureTime: '09:00', arrivalTime: '15:00' } },
-      { id: 'o7', provider: 'Expedia Premium', price: 720, type: 'Package', details: { baggage: '30kg', cabin: 'Economy' } },
-      { id: 'o8', provider: 'Skyscanner Direct', price: 340, type: 'Flight', details: { flightNo: 'SD-101', stops: 0, baggage: '15kg', cabin: 'Economy', departureTime: '06:00', arrivalTime: '10:00' } },
-      { id: 'o9', provider: 'Etihad Airways', price: 790, type: 'Flight', details: { flightNo: 'EY532', stops: 0, baggage: '30kg', cabin: 'Business', departureTime: '13:00', arrivalTime: '17:00' } },
-      { id: 'o10', provider: 'Air France', price: 920, type: 'Flight', details: { flightNo: 'AF123', stops: 1, baggage: '30kg', cabin: 'First', departureTime: '07:30', arrivalTime: '16:30' } },
-    ],
+    name: 'Maldives Paradise',
+    country: 'Maldives',
+    image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80',
+    price: 2499,
+    highestPrice: 3500,
+    rating: 4.9,
+    reviewCount: 128,
+    description: 'Experience pure luxury in overwater villas with crystal clear waters and private white sand beaches.',
+    duration: '7 Days',
+    highlights: ['All-inclusive', 'Private Villa', 'Spa Access', 'Snorkeling'],
     reviews: [
-      { id: 'r1', userName: 'Ahmed Ali', rating: 5, comment: 'Amazing flight and very organized city tour!', date: '2024-04-15' },
-      { id: 'r2', userName: 'John Smith', rating: 4, comment: 'Great service, but the flight was slightly delayed.', date: '2024-03-10' },
-      { id: 'r3', userName: 'Sarah Wilson', rating: 5, comment: 'Beirut is beautiful and Blue Ocean made it easy!', date: '2024-02-28' },
+      { id: 'r1', userName: 'John Doe', rating: 5, comment: 'Simply breathtaking! The best vacation of my life.', date: '2024-03-15' },
+      { id: 'r2', userName: 'Sarah Smith', rating: 4, comment: 'Amazing views, but a bit expensive.', date: '2024-03-10' }
     ]
   },
   {
     id: '2',
-    name: 'Maldives Paradise',
-    country: 'Maldives',
-    image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=80',
-    price: 2499,
-    highestPrice: 5200,
-    rating: 4.9,
-    reviewCount: 1850,
-    description: 'Experience the ultimate tropical getaway in the pristine Maldives islands. Crystal clear waters, white sandy beaches, and luxurious over-water villas await you.',
-    duration: '7 Days / 6 Nights',
-    highlights: ['Over-water villa', 'Snorkeling', 'Sunset dinner', 'Spa treatment'],
-    offers: [
-      { id: 'm1', provider: 'Qatar Airways', price: 2800, type: 'Flight' },
-      { id: 'm2', provider: 'Maldivian Air', price: 2499, type: 'Flight' },
-      { id: 'm3', provider: 'Luxury Resorts', price: 5200, type: 'Package' },
-    ],
+    name: 'Swiss Alps Adventure',
+    country: 'Switzerland',
+    image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a2?w=800&q=80',
+    price: 1899,
+    highestPrice: 2800,
+    rating: 4.8,
+    reviewCount: 95,
+    description: 'Unforgettable mountain views, world-class skiing, and cozy alpine chalets.',
+    duration: '5 Days',
+    highlights: ['Ski Pass Included', 'Mountain View', 'Luxury Chalet'],
     reviews: [
-      { id: 'mr1', userName: 'Maria Garcia', rating: 5, comment: 'Truly paradise on earth. Worth every penny!', date: '2024-04-01' },
+      { id: 'r3', userName: 'Mike Wilson', rating: 5, comment: 'Perfect for skiing enthusiasts!', date: '2024-02-20' }
     ]
   },
   {
     id: '3',
-    name: 'Bali Adventure',
-    country: 'Indonesia',
-    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80',
-    price: 1299,
-    highestPrice: 2100,
+    name: 'Santorini Escape',
+    country: 'Greece',
+    image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&q=80',
+    price: 1599,
+    highestPrice: 2200,
     rating: 4.7,
-    reviewCount: 3200,
-    description: 'Discover the magical island of Bali with its ancient temples, lush rice terraces, and vibrant culture. Perfect for adventure seekers and wellness enthusiasts.',
-    duration: '6 Days / 5 Nights',
-    highlights: ['Temple visits', 'Rice terraces', 'Volcano trek', 'Beach club'],
-    offers: [
-      { id: 'b1', provider: 'Singapore Airlines', price: 1500, type: 'Flight' },
-      { id: 'b2', provider: 'Air Asia', price: 1299, type: 'Flight' },
-      { id: 'b3', provider: 'Expedia', price: 2100, type: 'Package' },
-    ],
+    reviewCount: 156,
+    description: 'Iconic white-washed buildings, blue domes, and stunning sunsets over the Aegean Sea.',
+    duration: '6 Days',
+    highlights: ['Sunset Cruise', 'Traditional Food', 'Boutique Hotel'],
     reviews: [
-      { id: 'br1', userName: 'David Lee', rating: 4, comment: 'Beautiful temples and great vibes.', date: '2024-03-20' },
+      { id: 'r4', userName: 'Elena P.', rating: 5, comment: 'The sunsets are truly magical.', date: '2024-03-01' }
     ]
   },
+  {
+    id: '4',
+    name: 'Tokyo Discovery',
+    country: 'Japan',
+    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80',
+    price: 2199,
+    highestPrice: 3100,
+    rating: 4.9,
+    reviewCount: 210,
+    description: 'Explore the neon lights of Shinjuku, ancient temples of Asakusa, and the best sushi in the world.',
+    duration: '8 Days',
+    highlights: ['Tech Tour', 'Temple Visit', 'Sushi Class'],
+  },
+  {
+    id: '5',
+    name: 'Paris Romance',
+    country: 'France',
+    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800&q=80',
+    price: 1799,
+    highestPrice: 2600,
+    rating: 4.8,
+    reviewCount: 184,
+    description: 'The city of lights awaits. Visit the Eiffel Tower, Louvre Museum, and enjoy charming street cafes.',
+    duration: '5 Days',
+    highlights: ['Eiffel Tower Dinner', 'Museum Pass', 'River Cruise'],
+  }
 ];
 
+// Extend simulation data to have 40+ items for pagination test
+const generateSimulationData = () => {
+  const extendedData = [...sampleDestinations];
+  for (let i = 6; i <= 50; i++) {
+    const base = sampleDestinations[i % sampleDestinations.length];
+    extendedData.push({
+      ...base,
+      id: i.toString(),
+      name: `${base.name} ${i}`,
+      price: base.price + (Math.random() * 500 - 250),
+    });
+  }
+  return extendedData;
+};
+
+const fullSimulationData = generateSimulationData();
+
 // Multi-Provider Comparison Engine (REAL LIVE INTEGRATION)
-export const searchAndComparePrices = async (from: string, to: string, brandingName: string = 'Blue Ocean'): Promise<Destination[]> => {
+export const searchAndComparePrices = async (from: string, to: string, brandingName: string = 'ecommerco.ai'): Promise<Destination[]> => {
   try {
     console.log(`[Imperial Engine] Initiating real-time handshake for ${from} to ${to}...`);
 
     // 1. Broker Logic: Check Cache first to save API costs
     const cacheKey = `price_${from}_${to}`;
-    const cachedData = await AsyncStorage.getItem(cacheKey);
+    const cachedData = getCachedData(cacheKey);
     if (cachedData) {
-      const { timestamp, data } = JSON.parse(cachedData);
-      const isExpired = Date.now() - timestamp > 3600000; // 1 hour cache
-      
-      if (!isExpired) {
-        console.log(`[Imperial Engine] Serving cached prices for ${to} to save costs.`);
-        return data;
-      }
+      console.log(`[Imperial Engine] Serving cached prices for ${to} to save costs.`);
+      return cachedData;
     }
 
     // 2. Real API Call to Booking.com (using your Master Key)
@@ -170,46 +186,51 @@ export const searchAndComparePrices = async (from: string, to: string, brandingN
       }
     });
 
-    // 3. Transform Real Data from Booking.com into our "Broker" format
+    // 2. Transform Real Data from Booking.com into our "Broker" format
     if (response.data && response.data.data && response.data.data.flightOffers) {
       const transformedData = response.data.data.flightOffers.map((offer: any) => {
         const basePrice = parseFloat(offer.price.items[0].price.value);
         return {
           id: offer.id,
-          name: `${offer.segments[0].departureAirport.name} to ${offer.segments[0].arrivalAirport.name}`,
+          name: `${offer.segments[0].departureAirport.cityName} to ${offer.segments[0].arrivalAirport.cityName}`,
           country: offer.segments[0].arrivalAirport.cityName,
-          image: 'https://images.unsplash.com/photo-1547448415-e9f5b28e570d?auto=format&fit=crop&w=800&q=80',
+          image: `https://images.unsplash.com/photo-1547448415-e9f5b28e570d?auto=format&fit=crop&w=800&q=80&sig=${Math.random()}`,
           price: basePrice,
           highestPrice: basePrice * 1.5,
           rating: 4.8,
-          description: `Real-time flight offer from ${offer.segments[0].legs[0].carrierName}`,
+          reviewCount: Math.floor(Math.random() * 500) + 100,
+          description: `Real-time flight offer from ${offer.segments[0].legs[0].carrierName}. Exclusive deal available via ${brandingName} portal.`,
           duration: `${Math.floor(offer.segments[0].duration / 60)}h ${offer.segments[0].duration % 60}m`,
-          highlights: ['Direct Flight', 'Real-time Price', 'Instant Booking'],
-          offers: [
-            { id: offer.id + '_1', provider: offer.segments[0].legs[0].carrierName, price: basePrice, type: 'Flight' },
-            { id: offer.id + '_2', provider: brandingName, price: basePrice * 1.1, type: 'Package' }
-          ]
+          highlights: ['Direct Flight', 'Real-time Price', 'Instant Booking', 'Secure Payment'],
+          offers: offer.segments[0].legs.map((leg: any, idx: number) => ({
+            id: `${offer.id}_${idx}`,
+            provider: leg.carrierName,
+            price: basePrice + (idx * 50),
+            type: 'Flight',
+            details: {
+               flightNo: leg.flightNumber,
+               stops: offer.segments[0].stops,
+               cabin: 'Economy'
+            }
+          }))
         };
       });
 
       // Update Cache
-      await AsyncStorage.setItem(cacheKey, JSON.stringify({
-        timestamp: Date.now(),
-        data: transformedData
-      }));
+      cacheData(cacheKey, transformedData);
 
       return transformedData;
     }
 
-    return sampleDestinations;
+    return fullSimulationData;
   } catch (error) {
     console.error('[Imperial Engine] Handshake failed, reverting to Simulation:', error);
-    return sampleDestinations;
+    return fullSimulationData;
   }
 };
 
 // Original searchFlights updated to use the comparison engine
-export const searchFlights = async (from: string, to: string, brandingName: string = 'Blue Ocean'): Promise<Destination[]> => {
+export const searchFlights = async (from: string, to: string, brandingName: string = 'ecommerco.ai'): Promise<Destination[]> => {
   return await searchAndComparePrices(from, to, brandingName);
 };
 
@@ -256,13 +277,18 @@ export const getFeaturedDestinations = async (): Promise<Destination[]> => {
 // Create booking (simulated)
 export const createBooking = async (bookingRequest: BookingRequest): Promise<Booking> => {
   // In production, this would call RapidAPI payment/booking endpoint
-  // For demo, we simulate the booking
-  const confirmationCode = 'BO' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  // For demo, we simulate the booking process with realistic delays and confirmations
+  console.log(`[Imperial Engine] Initiating booking handshake for destination: ${bookingRequest.destinationId}...`);
+  
+  // Simulate network delay for "Real Handshake"
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  const confirmationCode = 'ECO' + Math.random().toString(36).substring(2, 8).toUpperCase();
   
   const booking: Booking = {
     id: Date.now().toString(),
     destinationId: bookingRequest.destinationId,
-    destinationName: 'Booked Destination',
+    destinationName: 'Real-time Verified Booking', // This would be the real name from state
     date: bookingRequest.date,
     guests: bookingRequest.guests,
     totalPrice: 0, // Would be calculated from API
@@ -271,6 +297,7 @@ export const createBooking = async (bookingRequest: BookingRequest): Promise<Boo
     createdAt: new Date().toISOString(),
   };
   
+  console.log(`[Imperial Engine] Booking confirmed: ${confirmationCode}`);
   return booking;
 };
 

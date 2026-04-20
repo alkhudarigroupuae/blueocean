@@ -1,18 +1,18 @@
 // Theme Colors
 export const Colors = {
-  primary: '#ed7430', // New Brand Color
-  secondary: '#00A3CC',
-  accent: '#ed7430', // Unified with brand
-  background: '#FFFFFF',
-  backgroundLight: '#F5F8FA',
-  text: '#1A1A1A',
-  textLight: '#666666',
-  textMuted: '#999999',
+  primary: '#FFD400', // CEO's Yellow
+  secondary: '#FFFFFF', // Clean White for SaaS look
+  accent: '#FFD400', 
+  background: '#000000', // OLED Pure Black
+  backgroundLight: '#0A0A0A', // Near Black
+  text: '#FFFFFF',
+  textLight: '#A1A1AA', // Zinc 400
+  textMuted: '#71717A', // Zinc 500
   white: '#FFFFFF',
-  success: '#22C55E',
+  success: '#10B981',
   error: '#EF4444',
   warning: '#F59E0B',
-  border: '#E5E7EB',
+  border: '#27272A', // Zinc 800
 };
 
 // Destinations Types

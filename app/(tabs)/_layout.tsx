@@ -4,31 +4,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store';
 import { Colors } from '../../types';
 
-function TabIcon({ name, label, focused }: { name: any; label: string; focused: boolean }) {
-  const { theme } = useStore();
+function TabIcon({ name, focused }: { name: any; focused: boolean }) {
+  const { theme, apiSettings } = useStore();
   const isDark = theme === 'dark';
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
 
   return (
     <View style={styles.tabItem}>
       <Ionicons 
         name={name} 
         size={24} 
-        color={focused ? Colors.primary : (isDark ? '#444' : '#999')} 
+        color={focused ? primaryColor : (isDark ? '#444' : '#999')} 
       />
-      <Text style={[
-        styles.tabLabel, 
-        focused && styles.tabLabelActive,
-        isDark && { color: focused ? Colors.primary : '#444' }
-      ]}>
-        {label}
-      </Text>
     </View>
   );
 }
 
 export default function TabLayout() {
-  const { theme } = useStore();
+  const { theme, apiSettings } = useStore();
   const isDark = theme === 'dark';
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
 
   return (
     <Tabs
@@ -41,32 +36,32 @@ export default function TabLayout() {
           height: 60,
           paddingBottom: 0,
         },
-        tabBarActiveTintColor: Colors.primary,
+        tabBarActiveTintColor: primaryColor,
         tabBarInactiveTintColor: isDark ? '#444' : '#999',
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "home" : "home-outline"} label="Home" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "home" : "home-outline"} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "search" : "search-outline"} label="Search" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "search" : "search-outline"} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="bookings"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "list" : "list-outline"} label="Bookings" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "list" : "list-outline"} focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "person" : "person-outline"} label="Profile" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon name={focused ? "person" : "person-outline"} focused={focused} />,
         }}
       />
     </Tabs>
@@ -88,22 +83,5 @@ const styles = StyleSheet.create({
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  tabIcon: {
-    fontSize: 24,
-    marginBottom: 4,
-    opacity: 0.5,
-  },
-  tabIconActive: {
-    opacity: 1,
-  },
-  tabLabel: {
-    fontSize: 11,
-    color: Colors.textMuted,
-    fontWeight: '500',
-  },
-  tabLabelActive: {
-    color: Colors.primary,
-    fontWeight: '700',
   },
 });

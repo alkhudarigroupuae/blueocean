@@ -15,23 +15,29 @@ export const Header: React.FC<HeaderProps> = ({ title, showBack, onBack }) => {
   const isDark = theme === 'dark';
 
   return (
-    <View style={[styles.header, isDark && { backgroundColor: '#0A0A0A', borderBottomWidth: 1, borderBottomColor: '#1A1A1A' }]}>
+    <View style={[
+      styles.header, 
+      { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
+      { borderBottomWidth: 1, borderBottomColor: isDark ? '#111111' : '#F3F4F6' }
+    ]}>
       <View style={styles.headerContent}>
-        {showBack && (
-          <TouchableOpacity onPress={onBack} style={[styles.backButton, isDark && { backgroundColor: '#1A1A1A' }]}>
-            <Text style={[styles.backText, isDark && { color: '#FFFFFF' }]}>←</Text>
-          </TouchableOpacity>
-        )}
-        <View style={styles.logoContainer}>
-          <Logo size="small" />
-          {title && (
-            <View style={styles.titleWrapper}>
-              <View style={[styles.titleDivider, { backgroundColor: isDark ? '#333' : '#E5E7EB' }]} />
-              <Text style={[styles.pageTitle, isDark && { color: '#ed7430' }]}>{title}</Text>
-            </View>
+        <View style={styles.leftContainer}>
+          {showBack && (
+            <TouchableOpacity onPress={onBack} style={[styles.backButton, { backgroundColor: isDark ? '#111111' : '#F3F4F6' }]}>
+              <Text style={[styles.backText, { color: isDark ? '#FFFFFF' : '#111' }]}>←</Text>
+            </TouchableOpacity>
           )}
+          <View style={styles.logoContainer}>
+            <Logo size="small" />
+            {title && (
+              <View style={styles.titleWrapper}>
+                <View style={[styles.titleDivider, { backgroundColor: isDark ? '#222' : '#E5E7EB' }]} />
+                <Text style={[styles.pageTitle, { color: isDark ? '#FFFFFF' : '#111' }]}>{title}</Text>
+              </View>
+            )}
+          </View>
         </View>
-        <View style={styles.placeholder} />
+        <View style={styles.headerRight} />
       </View>
     </View>
   );
@@ -49,14 +55,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChangeText, place
   const isDark = theme === 'dark';
 
   return (
-    <View style={[styles.searchContainer, isDark && { backgroundColor: '#0A0A0A', borderColor: '#1A1A1A' }]}>
+    <View style={[styles.searchContainer, isDark && { backgroundColor: '#0A0A0A', borderColor: '#27272A', borderWidth: 1 }]}>
       <Text style={styles.searchIcon}>🔍</Text>
       <TextInput
         style={[styles.searchInput, isDark && { color: '#FFFFFF' }]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder || 'Search destinations...'}
-        placeholderTextColor={isDark ? '#444' : Colors.textMuted}
+        placeholderTextColor={isDark ? '#52525B' : Colors.textMuted}
         onSubmitEditing={onSubmit}
       />
       {value.length > 0 && (
@@ -76,17 +82,22 @@ interface ButtonProps {
 }
 
 export const Button: React.FC<ButtonProps> = ({ title, onPress, variant = 'primary', disabled }) => {
+  const { apiSettings } = useStore();
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
+
   const buttonStyles = [
     styles.button,
-    variant === 'primary' && styles.buttonPrimary,
-    variant === 'secondary' && styles.buttonSecondary,
-    variant === 'outline' && styles.buttonOutline,
-    disabled && styles.buttonDisabled,
+    variant === 'primary' && { backgroundColor: primaryColor },
+    variant === 'secondary' && { backgroundColor: '#27272A' },
+    variant === 'outline' && { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#27272A' },
+    disabled && { opacity: 0.5 },
   ];
   
   const textStyles = [
     styles.buttonText,
-    variant === 'outline' && styles.buttonTextOutline,
+    variant === 'primary' && { color: '#000000' },
+    variant === 'secondary' && { color: '#FFFFFF' },
+    variant === 'outline' && { color: '#FFFFFF' },
   ];
 
   return (
@@ -96,31 +107,43 @@ export const Button: React.FC<ButtonProps> = ({ title, onPress, variant = 'prima
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <Text style={textStyles}>{title}</Text>
+      <Text style={[textStyles, { fontWeight: '700' }]}>{title}</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: Colors.primary,
     paddingTop: 50,
     paddingBottom: 16,
-    paddingHorizontal: 20,
+    width: '100%',
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    height: 40,
+    paddingHorizontal: 20,
+  },
+  leftContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  headerRight: {
+    width: 40,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   backText: {
-    fontSize: 24,
-    color: Colors.white,
+    fontSize: 18,
+    fontWeight: '700',
   },
   logoContainer: {
     flexDirection: 'row',
@@ -132,7 +155,7 @@ const styles = StyleSheet.create({
   },
   titleDivider: {
     width: 1,
-    height: 24,
+    height: 20,
     marginHorizontal: 12,
   },
   logoCircle: {

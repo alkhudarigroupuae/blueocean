@@ -1,350 +1,138 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../../store';
-import { getImperialAnalytics } from '../../services/api';
+import { Colors } from '../../types';
 
-const { width } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const IS_DESKTOP = SCREEN_WIDTH > 1024;
 
-export default function TrafficAnalytics() {
+export default function AnalyticsScreen() {
   const router = useRouter();
-  const { apiSettings } = useStore();
-  const [loading, setLoading] = useState(true);
-  
-  const [stats, setStats] = useState({
-    totalCalls: 0,
-    errorRate: 0,
-    latency: 0,
-    trafficData: [0, 0, 0, 0, 0, 0, 0]
-  });
+  const { theme, bookings } = useStore();
+  const isDark = theme === 'dark';
 
-  const [activeFilter, setActiveTab] = useState('7d');
+  const dynamicStyles = {
+    container: { backgroundColor: isDark ? '#050505' : '#F9FAFB' },
+    card: { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#E5E7EB' },
+    text: { color: isDark ? '#FFFFFF' : '#111827' },
+    subText: { color: isDark ? '#9CA3AF' : '#6B7280' },
+  };
 
-  useEffect(() => {
-    const loadAnalytics = async () => {
-      setLoading(true);
-      try {
-        const data = await getImperialAnalytics(activeFilter);
-        setStats({
-          totalCalls: data.totalCalls,
-          errorRate: data.errorRate,
-          latency: data.latency,
-          trafficData: data.trafficData
-        });
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Mock data for charts (Simulating real metrics)
+  const monthlyStats = [
+    { month: 'Jan', revenue: 4500, profit: 675 },
+    { month: 'Feb', revenue: 5200, profit: 780 },
+    { month: 'Mar', revenue: 4800, profit: 720 },
+    { month: 'Apr', revenue: 6100, profit: 915 },
+  ];
 
-    loadAnalytics();
-  }, [activeFilter]);
-
-  const timeFilters = ['1h', '3h', '12h', '24h', '7d', '30d', '90d'];
+  const maxRevenue = Math.max(...monthlyStats.map(s => s.revenue));
 
   return (
-    <View style={styles.container}>
-      {/* Header like in the image */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Imperial Analytics</Text>
-          <View style={{ width: 24 }} />
-        </View>
-        
-        <View style={styles.tabContainer}>
-          <Text style={[styles.tab, styles.activeTab]}>Traffic Analytics</Text>
-          <Text style={styles.tab}>User Analytics</Text>
-          <Text style={styles.tab}>Revenue</Text>
+    <View style={[styles.container, dynamicStyles.container]}>
+      {/* Header */}
+      <View style={[styles.header, dynamicStyles.card]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <Ionicons name="arrow-back" size={24} color={dynamicStyles.text.color} />
+        </TouchableOpacity>
+        <View>
+          <Text style={[styles.headerTitle, dynamicStyles.text]}>Imperial Analytics</Text>
+          <Text style={[styles.headerSub, dynamicStyles.subText]}>Real-time performance metrics</Text>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Filters Row */}
-        <View style={styles.filterRow}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {timeFilters.map(f => (
-              <TouchableOpacity 
-                key={f} 
-                style={[styles.filterChip, activeFilter === f && styles.activeFilterChip]}
-                onPress={() => setActiveTab(f)}
-              >
-                <Text style={[styles.filterText, activeFilter === f && styles.activeFilterText]}>{f}</Text>
-              </TouchableOpacity>
+        {/* Revenue Chart (Visualized with simple bars for maximum performance) */}
+        <View style={[styles.chartCard, dynamicStyles.card]}>
+          <Text style={[styles.cardTitle, dynamicStyles.text]}>Revenue Performance (2026)</Text>
+          <View style={styles.chartContainer}>
+            {monthlyStats.map((item, index) => (
+              <View key={index} style={styles.chartColumn}>
+                <View style={[styles.chartBar, { height: (item.revenue / maxRevenue) * 150, backgroundColor: Colors.primary }]} />
+                <Text style={[styles.chartLabel, dynamicStyles.subText]}>{item.month}</Text>
+                <Text style={[styles.chartValue, dynamicStyles.text]}>${item.revenue}</Text>
+              </View>
             ))}
-          </ScrollView>
-        </View>
-
-        {/* Key Metrics like in the image */}
-        <View style={styles.metricsRow}>
-          <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>Total API calls</Text>
-            <Text style={styles.metricValue}>{stats.totalCalls}</Text>
-          </View>
-          <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>Average Error Rate</Text>
-            <Text style={[styles.metricValue, { color: '#22C55E' }]}>{stats.errorRate}%</Text>
-          </View>
-          <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>Average Latency</Text>
-            <Text style={styles.metricValue}>{stats.latency}ms</Text>
           </View>
         </View>
 
-        {/* Chart Visualization (Simulated Refine/Shadcn style) */}
-        <View style={styles.chartContainer}>
-          <View style={styles.chartHeader}>
-             <Text style={styles.chartTitle}>Request Traffic</Text>
-             <View style={styles.chartLegend}>
-                <View style={[styles.legendDot, { backgroundColor: '#22C55E' }]} />
-                <Text style={styles.legendText}>API calls</Text>
-                <View style={[styles.legendDot, { backgroundColor: '#EF4444', marginLeft: 10 }]} />
-                <Text style={styles.legendText}>Errors</Text>
-             </View>
+        <View style={styles.grid}>
+          {/* Booking Sources */}
+          <View style={[styles.gridCard, dynamicStyles.card]}>
+            <Text style={[styles.cardTitle, dynamicStyles.text]}>Booking Sources</Text>
+            {[
+              { label: 'Direct App', value: '65%', color: '#10B981' },
+              { label: 'Sub-Brokers', value: '25%', color: '#6366F1' },
+              { label: 'External API', value: '10%', color: '#F59E0B' },
+            ].map((source, i) => (
+              <View key={i} style={styles.sourceRow}>
+                <View style={styles.sourceInfo}>
+                  <View style={[styles.colorDot, { backgroundColor: source.color }]} />
+                  <Text style={[styles.sourceLabel, dynamicStyles.text]}>{source.label}</Text>
+                </View>
+                <Text style={[styles.sourceValue, dynamicStyles.text]}>{source.value}</Text>
+              </View>
+            ))}
           </View>
-          
-          <View style={styles.chartBody}>
-            {/* Mock Chart Lines */}
-            <View style={styles.chartGrid}>
-               {[1, 2, 3, 4, 5].map(i => <View key={i} style={styles.gridLine} />)}
-               
-               {/* Animated-like Bar bars for visual parity with your image */}
-               <View style={styles.barsContainer}>
-                  {stats.trafficData.map((h, i) => (
-                    <View key={i} style={styles.barGroup}>
-                       <View style={[styles.bar, { height: `${h}%`, backgroundColor: '#22C55E' }]} />
-                       <View style={[styles.bar, { height: `${h/10}%`, backgroundColor: '#EF4444' }]} />
-                    </View>
-                  ))}
-               </View>
-            </View>
-            
-            <View style={styles.xAxis}>
-               {['Apr 12', '14', '16', '18', '20'].map(d => (
-                 <Text key={d} style={styles.axisText}>{d}</Text>
-               ))}
+
+          {/* User Retention */}
+          <View style={[styles.gridCard, dynamicStyles.card]}>
+            <Text style={[styles.cardTitle, dynamicStyles.text]}>Node Latency</Text>
+            <View style={styles.latencyContainer}>
+              <View style={styles.latencyCircle}>
+                <Text style={[styles.latencyValue, { color: '#10B981' }]}>12ms</Text>
+                <Text style={[styles.latencyLabel, dynamicStyles.subText]}>Global Average</Text>
+              </View>
+              <Text style={[styles.latencyStatus, { color: '#10B981' }]}>● SYSTEM OPTIMIZED</Text>
             </View>
           </View>
-        </View>
-
-        {/* Footer Support Info */}
-        <View style={styles.footer}>
-           <Text style={styles.footerText}>Handshaking with RapidAPI Global Servers...</Text>
-           <View style={styles.secureBadge}>
-              <Text style={styles.secureText}>RSA-4096 SECURE</Text>
-           </View>
         </View>
       </ScrollView>
-
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#FFD400" />
-          <Text style={styles.loadingText}>Syncing with RapidAPI...</Text>
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB', // Light gray like RapidAPI Studio
+  container: { flex: 1 },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingTop: Platform.OS === 'ios' ? 60 : 40, 
+    paddingHorizontal: 25, 
+    paddingBottom: 25, 
+    borderBottomWidth: 1 
   },
-  header: {
-    backgroundColor: '#FFFFFF',
-    paddingTop: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+  backBtn: { marginRight: 20, padding: 8, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.03)' },
+  headerTitle: { fontSize: 20, fontWeight: '800' },
+  headerSub: { fontSize: 13, marginTop: 2 },
+  scrollContent: { padding: 25 },
+  chartCard: { padding: 25, borderRadius: 24, borderWidth: 1, marginBottom: 25 },
+  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 30 },
+  chartContainer: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', height: 200 },
+  chartColumn: { alignItems: 'center', flex: 1 },
+  chartBar: { width: 30, borderRadius: 8, marginBottom: 15 },
+  chartLabel: { fontSize: 12, fontWeight: '600' },
+  chartValue: { fontSize: 10, marginTop: 4, fontWeight: '700' },
+  grid: { flexDirection: IS_DESKTOP ? 'row' : 'column', gap: 25 },
+  gridCard: { flex: 1, padding: 25, borderRadius: 24, borderWidth: 1 },
+  sourceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  sourceInfo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  colorDot: { width: 10, height: 10, borderRadius: 5 },
+  sourceLabel: { fontSize: 14, fontWeight: '600' },
+  sourceValue: { fontSize: 14, fontWeight: '700' },
+  latencyContainer: { alignItems: 'center', justifyContent: 'center', flex: 1 },
+  latencyCircle: { 
+    width: 120, 
+    height: 120, 
+    borderRadius: 60, 
+    borderWidth: 8, 
+    borderColor: '#10B98120', 
+    alignItems: 'center', 
+    justifyContent: 'center' 
   },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  backArrow: {
-    fontSize: 24,
-    color: '#374151',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-  },
-  tab: {
-    paddingVertical: 12,
-    marginRight: 24,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-  activeTab: {
-    color: '#2563EB',
-    borderBottomWidth: 2,
-    borderBottomColor: '#2563EB',
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  filterRow: {
-    marginBottom: 24,
-  },
-  filterChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    marginRight: 8,
-  },
-  activeFilterChip: {
-    backgroundColor: '#F3F4F6',
-    borderColor: '#374151',
-  },
-  filterText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  activeFilterText: {
-    color: '#111827',
-  },
-  metricsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  metricCard: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  metricLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  metricValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  chartContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    height: 400,
-  },
-  chartHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  chartLegend: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  legendText: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginLeft: 6,
-  },
-  chartBody: {
-    flex: 1,
-  },
-  chartGrid: {
-    flex: 1,
-    justifyContent: 'space-between',
-    position: 'relative',
-  },
-  gridLine: {
-    height: 1,
-    backgroundColor: '#F3F4F6',
-    width: '100%',
-  },
-  barsContainer: {
-    ...StyleSheet.absoluteFillObject,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-around',
-    paddingHorizontal: 10,
-  },
-  barGroup: {
-    width: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    height: '100%',
-  },
-  bar: {
-    width: 8,
-    borderRadius: 4,
-    marginBottom: 2,
-  },
-  xAxis: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 15,
-    paddingHorizontal: 5,
-  },
-  axisText: {
-    fontSize: 11,
-    color: '#9CA3AF',
-  },
-  footer: {
-    marginTop: 30,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 11,
-    color: '#9CA3AF',
-    fontStyle: 'italic',
-  },
-  secureBadge: {
-    marginTop: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    backgroundColor: '#000',
-    borderRadius: 4,
-  },
-  secureText: {
-    color: '#FFD400',
-    fontSize: 10,
-    fontWeight: '900',
-  },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  loadingText: {
-    marginTop: 15,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-  }
+  latencyValue: { fontSize: 24, fontWeight: '900' },
+  latencyLabel: { fontSize: 10, fontWeight: '700', marginTop: 4 },
+  latencyStatus: { marginTop: 20, fontSize: 11, fontWeight: '800', letterSpacing: 1 },
 });

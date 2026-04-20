@@ -32,8 +32,16 @@ const mockBookings: Booking[] = [
 
 export default function BookingsScreen() {
   const router = useRouter();
-  const { bookings, setBookings } = useStore();
+  const { bookings, setBookings, theme } = useStore();
   const displayBookings = bookings.length > 0 ? bookings : mockBookings;
+
+  const isDark = theme === 'dark';
+  const dynamicStyles = {
+    container: { backgroundColor: isDark ? '#000000' : Colors.backgroundLight },
+    text: { color: isDark ? '#FFFFFF' : Colors.text },
+    subText: { color: isDark ? '#888888' : Colors.textLight },
+    card: { backgroundColor: isDark ? '#0A0A0A' : Colors.white, borderColor: isDark ? '#1A1A1A' : Colors.border },
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

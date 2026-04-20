@@ -1,13 +1,15 @@
 import React from 'react';
-import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
+import { Colors } from '../types';
 
 export const Logo: React.FC<{ size?: 'small' | 'large', mode?: 'full' | 'icon' }> = ({ size = 'small', mode }) => {
   const router = useRouter();
   const isLarge = size === 'large';
-  const { apiSettings } = useStore();
+  const { apiSettings, theme } = useStore();
   const { branding } = apiSettings;
+  const isDark = theme === 'dark';
 
   const renderLogo = () => {
     // If explicit mode is icon, always return the icon
@@ -21,15 +23,19 @@ export const Logo: React.FC<{ size?: 'small' | 'large', mode?: 'full' | 'icon' }
       );
     }
 
+    const companyParts = branding.companyName.split('.');
+    const mainName = companyParts[0];
+    const extension = companyParts[1] ? `.${companyParts[1]}` : '';
+
     switch (branding.logoType) {
       case 'FullText':
         return (
           <View style={styles.textWrapper}>
-            <Text style={[styles.brandText, isLarge ? styles.textLarge : styles.textSmall]}>
-              {branding.companyName.split(' ')[0].toUpperCase()}
+            <Text style={[styles.brandText, isLarge ? styles.textLarge : styles.textSmall, { color: Colors.primary }]}>
+              {mainName.toUpperCase()}
             </Text>
-            <Text style={[styles.groupText, isLarge ? styles.groupLarge : styles.groupSmall]}>
-              {branding.companyName.split(' ').slice(1).join(' ').toUpperCase()}
+            <Text style={[styles.groupText, isLarge ? styles.groupLarge : styles.groupSmall, { color: isDark ? '#FFF' : '#000' }]}>
+              {extension.toUpperCase()}
             </Text>
           </View>
         );
@@ -42,11 +48,11 @@ export const Logo: React.FC<{ size?: 'small' | 'large', mode?: 'full' | 'icon' }
               resizeMode="contain"
             />
             <View style={styles.hybridTextWrapper}>
-              <Text style={[styles.brandText, isLarge ? styles.textMedium : styles.textXSmall]}>
-                {branding.companyName.split(' ')[0].toUpperCase()}
+              <Text style={[styles.brandText, isLarge ? styles.textMedium : styles.textXSmall, { color: Colors.primary }]}>
+                {mainName.toUpperCase()}
               </Text>
-              <Text style={[styles.groupText, isLarge ? styles.groupMedium : styles.groupXSmall]}>
-                {branding.companyName.split(' ').slice(1).join(' ').toUpperCase()}
+              <Text style={[styles.groupText, isLarge ? styles.groupMedium : styles.groupXSmall, { color: isDark ? '#FFF' : '#000' }]}>
+                {extension.toUpperCase()}
               </Text>
             </View>
           </View>
@@ -80,12 +86,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoSmall: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
   },
   logoLarge: {
-    width: 120,
-    height: 120,
+    width: 80,
+    height: 80,
   },
   textWrapper: {
     alignItems: 'center',
@@ -93,37 +99,24 @@ const styles = StyleSheet.create({
   brandText: {
     fontWeight: '900',
     letterSpacing: 1.5,
-    color: '#000000',
   },
   textSmall: {
     fontSize: 18,
   },
   textLarge: {
-    fontSize: 36,
-  },
-  textMedium: {
-    fontSize: 24,
-  },
-  textXSmall: {
-    fontSize: 14,
+    fontSize: 32,
   },
   groupText: {
-    fontWeight: '700',
-    letterSpacing: 3,
-    color: '#F97316',
-    marginTop: -4,
+    fontWeight: '300',
+    letterSpacing: 4,
   },
   groupSmall: {
-    fontSize: 8,
+    fontSize: 10,
+    marginTop: -4,
   },
   groupLarge: {
-    fontSize: 16,
-  },
-  groupMedium: {
-    fontSize: 12,
-  },
-  groupXSmall: {
-    fontSize: 6,
+    fontSize: 14,
+    marginTop: -6,
   },
   hybridContainer: {
     flexDirection: 'row',
@@ -131,6 +124,21 @@ const styles = StyleSheet.create({
   },
   hybridTextWrapper: {
     marginLeft: 10,
-    alignItems: 'flex-start',
+  },
+  textMedium: {
+    fontSize: 24,
+    lineHeight: 24,
+  },
+  textXSmall: {
+    fontSize: 16,
+    lineHeight: 16,
+  },
+  groupMedium: {
+    fontSize: 10,
+    marginTop: -2,
+  },
+  groupXSmall: {
+    fontSize: 8,
+    marginTop: -2,
   },
 });

@@ -41,7 +41,7 @@ const blogPosts = [
 
 export default function BlogScreen() {
   const router = useRouter();
-  const { theme } = useStore();
+  const { theme, news } = useStore();
   const isDark = theme === 'dark';
 
   const dynamicStyles = {
@@ -50,6 +50,9 @@ export default function BlogScreen() {
     text: { color: isDark ? '#FFF' : '#111827' },
     subText: { color: isDark ? '#888' : '#6B7280' },
   };
+
+  // Combine static and dynamic news
+  const allPosts = [...blogPosts, ...news];
 
   return (
     <View style={[styles.container, dynamicStyles.container]}>
@@ -63,20 +66,26 @@ export default function BlogScreen() {
         <Text style={[styles.mainTitle, dynamicStyles.text]}>Latest Travel Insights</Text>
         <Text style={[styles.subtitle, dynamicStyles.subText]}>Expert advice and news from the Alkhudari Imperial Hub</Text>
 
-        {blogPosts.map((post) => (
-          <TouchableOpacity key={post.id} style={[styles.blogCard, dynamicStyles.card]}>
+        {allPosts.map((post: any) => (
+          <TouchableOpacity 
+            key={post.id} 
+            style={[styles.blogCard, dynamicStyles.card]}
+            onPress={() => router.push(`/blog/${post.id}`)}
+          >
             <Image source={{ uri: post.image }} style={styles.blogImage} />
             <View style={styles.cardContent}>
               <View style={styles.metaRow}>
-                <Text style={styles.category}>{post.category}</Text>
+                <Text style={styles.category}>{post.category || 'Travel'}</Text>
                 <Text style={styles.dot}>•</Text>
-                <Text style={styles.date}>{post.date}</Text>
+                <Text style={styles.date}>{post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Today')}</Text>
               </View>
               <Text style={[styles.postTitle, dynamicStyles.text]}>{post.title}</Text>
-              <Text style={[styles.excerpt, dynamicStyles.subText]} numberOfLines={2}>{post.excerpt}</Text>
+              <Text style={[styles.excerpt, dynamicStyles.subText]} numberOfLines={2}>
+                {post.excerpt || post.subtitle || post.content}
+              </Text>
               <View style={styles.footerRow}>
                 <Text style={styles.readMore}>Read Article</Text>
-                <Text style={styles.readTime}>{post.readTime}</Text>
+                <Text style={styles.readTime}>{post.readTime || '4 min read'}</Text>
               </View>
             </View>
           </TouchableOpacity>

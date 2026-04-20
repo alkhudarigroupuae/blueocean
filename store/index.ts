@@ -1,6 +1,4 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import create from 'zustand';
 import { Destination, Booking, User, NewsPost } from '../types';
 
 interface AppState {
@@ -62,6 +60,18 @@ interface AppState {
       companyName: string;
       tagline: string;
     };
+    tenants: Array<{
+      id: string;
+      companyName: string;
+      domain: string;
+      apiKey: string;
+      branding: {
+        logoType: 'Icon' | 'FullText' | 'Hybrid';
+        primaryColor: string;
+        tagline: string;
+      };
+    }>;
+    activeTenantId: string;
   };
   
   // Actions
@@ -80,97 +90,103 @@ interface AppState {
   updateApiSettings: (settings: Partial<AppState['apiSettings']>) => void;
 }
 
-export const useStore = create<AppState>()(
-  persist(
-    (set) => ({
-      user: { id: '1', name: 'Blue Ocean Traveler', email: 'traveler@blueocean.com' },
-      destinations: [],
-      bookings: [],
-      news: [
-        { 
-          id: '1', 
-          title: 'Global Travel Update', 
-          subtitle: 'New visa-free routes for 2026', 
-          content: 'The world is opening up! Several countries have announced new visa-free travel arrangements for UAE residents in 2026.',
-          image: 'https://images.unsplash.com/photo-1502602898657-3e917247a184?auto=format&fit=crop&w=800&q=80',
-          createdAt: new Date().toISOString(),
-          author: 'Admin'
-        },
-        { 
-          id: '2', 
-          title: 'Dubai Luxury Deals', 
-          subtitle: 'Save 40% on Burj Al Arab packages', 
-          content: 'Experience the height of luxury for less. Exclusive summer discounts are now available for all Imperial travel members.',
-          image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80',
-          createdAt: new Date().toISOString(),
-          author: 'Admin'
-        }
-      ],
-      selectedDestination: null,
-      isLoading: false,
-      searchQuery: '',
-      language: 'en',
-      theme: 'light',
-      
-      apiSettings: {
-        markupPercentage: 15,
-        certificates: [],
-        subscriptions: [
-          { id: '69d355f0f8c79228df20167c', apiName: 'Flights sky', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Apr 6, 2026 10:42', quotaUsage: '0%' },
-          { id: '699ef6c8935ecb4d0f79632b', apiName: 'NOWPayments', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Feb 25, 2026 17:19', quotaUsage: 'N/A' },
-          { id: '6944c087060be1fee97216ba', apiName: 'BIN Info Checker API', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Dec 19, 2025 07:03', quotaUsage: '0%' },
-          { id: '68f8b402bdce53c928b5d9a0', apiName: 'Demo Project', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Oct 22, 2025 14:37', quotaUsage: '0%' },
-        ],
-        providers: {
-          'Booking.com': { apiKey: '', apiHost: 'booking-com15.p.rapidapi.com', enabled: true },
-          'Skyscanner': { apiKey: '', apiHost: 'skyscanner44.p.rapidapi.com', enabled: true },
-          'TripAdvisor': { apiKey: '', apiHost: 'tripadvisor16.p.rapidapi.com', enabled: false },
-          'Google Flights': { apiKey: '', apiHost: 'google-flights12.p.rapidapi.com', enabled: false },
-        },
-        paymentGateways: {
-          activeGateway: 'None',
-          stripeKey: '',
-          tapKey: '',
-          nowPaymentsKey: '',
-          paypalClientId: '',
-          paypalSecret: '',
-          manualCryptoAddress: '',
-          manualCryptoNetwork: 'USDT (TRC20)',
-          enabledMethods: {
-            card: true,
-            paypal: true,
-            applePay: true,
-            googlePay: true,
-            crypto: true,
-          },
-        },
-        branding: {
-          logoType: 'Icon',
-          primaryColor: '#0066CC',
-          companyName: 'Alkhudari Group',
-          tagline: 'Imperial Travel & Brokerage Platform',
-        },
-      },
-      
-      setUser: (user) => set({ user }),
-      setDestinations: (destinations) => set({ destinations }),
-      setSelectedDestination: (destination) => set({ selectedDestination: destination }),
-      addBooking: (booking) => set((state) => ({ bookings: [booking, ...state.bookings] })),
-      setBookings: (bookings) => set({ bookings }),
-      addNews: (post) => set((state) => ({ news: [post, ...state.news] })),
-      setNews: (news) => set({ news }),
-      deleteNews: (id) => set((state) => ({ news: state.news.filter(n => n.id !== id) })),
-      setLoading: (isLoading) => set({ isLoading }),
-      setSearchQuery: (searchQuery) => set({ searchQuery }),
-      setLanguage: (language) => set({ language }),
-      setTheme: (theme) => set({ theme }),
-      updateApiSettings: (newSettings) => set((state) => ({ 
-        apiSettings: { ...state.apiSettings, ...newSettings } 
-      })),
-    }),
-    {
-      name: 'blue-ocean-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+export const useStore = create<AppState>((set) => ({
+  user: { id: '1', name: 'Blue Ocean Traveler', email: 'traveler@blueocean.com' },
+  destinations: [],
+  bookings: [],
+  news: [
+    { 
+      id: '1', 
+      title: 'Global Travel Update', 
+      subtitle: 'New visa-free routes for 2026', 
+      content: 'The world is opening up! Several countries have announced new visa-free travel arrangements for UAE residents in 2026.',
+      image: 'https://images.unsplash.com/photo-1502602898657-3e917247a184?auto=format&fit=crop&w=800&q=80',
+      createdAt: new Date().toISOString(),
+      author: 'Admin'
+    },
+    { 
+      id: '2', 
+      title: 'Dubai Luxury Deals', 
+      subtitle: 'Save 40% on Burj Al Arab packages', 
+      content: 'Experience the height of luxury for less. Exclusive summer discounts are now available for all Imperial travel members.',
+      image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80',
+      createdAt: new Date().toISOString(),
+      author: 'Admin'
     }
-  )
-);
+  ],
+  selectedDestination: null,
+  isLoading: false,
+  searchQuery: '',
+  language: 'en',
+  theme: 'dark',
+  
+  apiSettings: {
+    markupPercentage: 15,
+    certificates: [],
+    subscriptions: [
+      { id: '69d355f0f8c79228df20167c', apiName: 'Flights sky', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Apr 6, 2026 10:42', quotaUsage: '0%' },
+      { id: '699ef6c8935ecb4d0f79632b', apiName: 'NOWPayments', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Feb 25, 2026 17:19', quotaUsage: 'N/A' },
+      { id: '6944c087060be1fee97216ba', apiName: 'BIN Info Checker API', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Dec 19, 2025 07:03', quotaUsage: '0%' },
+      { id: '68f8b402bdce53c928b5d9a0', apiName: 'Demo Project', plan: 'Basic ($0.00 /mo)', status: 'Active', dateSubscribed: 'Oct 22, 2025 14:37', quotaUsage: '0%' },
+    ],
+    providers: {
+      'Booking.com': { apiKey: '', apiHost: 'booking-com15.p.rapidapi.com', enabled: true },
+      'Skyscanner': { apiKey: '', apiHost: 'skyscanner44.p.rapidapi.com', enabled: true },
+      'TripAdvisor': { apiKey: '', apiHost: 'tripadvisor16.p.rapidapi.com', enabled: false },
+      'Google Flights': { apiKey: '', apiHost: 'google-flights12.p.rapidapi.com', enabled: false },
+    },
+    paymentGateways: {
+      activeGateway: 'None',
+      stripeKey: '',
+      tapKey: '',
+      nowPaymentsKey: '',
+      paypalClientId: '',
+      paypalSecret: '',
+      manualCryptoAddress: '',
+      manualCryptoNetwork: 'USDT (TRC20)',
+      enabledMethods: {
+        card: true,
+        paypal: true,
+        applePay: true,
+        googlePay: true,
+        crypto: true,
+      },
+    },
+    branding: {
+      logoType: 'Hybrid',
+      primaryColor: '#FFD400',
+      companyName: 'ecommerco.ai',
+      tagline: 'Imperial Enterprise SaaS & Brokerage Platform',
+    },
+    tenants: [
+      {
+        id: 'default',
+        companyName: 'ecommerco.ai',
+        domain: 'ecommerco.ai',
+        apiKey: '6f2fcbc34fmsh738b32a4809cc60p13f140jsnb1110a344209',
+        branding: {
+          logoType: 'Hybrid',
+          primaryColor: '#FFD400',
+          tagline: 'Imperial Enterprise SaaS & Brokerage Platform',
+        }
+      }
+    ],
+    activeTenantId: 'default',
+  },
+  
+  setUser: (user) => set({ user }),
+  setDestinations: (destinations) => set({ destinations }),
+  setSelectedDestination: (destination) => set({ selectedDestination: destination }),
+  addBooking: (booking) => set((state) => ({ bookings: [booking, ...state.bookings] })),
+  setBookings: (bookings) => set({ bookings }),
+  addNews: (post) => set((state) => ({ news: [post, ...state.news] })),
+  setNews: (news) => set({ news }),
+  deleteNews: (id) => set((state) => ({ news: state.news.filter(n => n.id !== id) })),
+  setLoading: (isLoading) => set({ isLoading }),
+  setSearchQuery: (searchQuery) => set({ searchQuery }),
+  setLanguage: (language) => set({ language }),
+  setTheme: (theme) => set({ theme }),
+  updateApiSettings: (newSettings) => set((state) => ({ 
+    apiSettings: { ...state.apiSettings, ...newSettings } 
+  })),
+}));

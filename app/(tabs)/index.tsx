@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, ActivityIndicator, Animated, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, ActivityIndicator, Animated, RefreshControl, Alert } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import Head from 'expo-router/head';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +16,7 @@ const { width } = Dimensions.get('window');
 export default function HomeScreen() {
   const router = useRouter();
   const { destinations, setDestinations, searchQuery, setSearchQuery, theme, news, apiSettings } = useStore();
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
   const [featured, setFeatured] = useState<Destination[]>([]);
   const [popular, setPopular] = useState<Destination[]>([]);
   
@@ -45,21 +46,15 @@ export default function HomeScreen() {
   const dynamicStyles = {
     container: { backgroundColor: isDark ? '#000000' : '#FFFFFF' },
     text: { color: isDark ? '#FFFFFF' : Colors.text },
-    subText: { color: isDark ? '#888888' : Colors.textLight },
-    sectionTitle: { color: isDark ? '#FFFFFF' : '#1A1A1A' },
+    subText: { color: isDark ? '#A1A1AA' : Colors.textLight },
+    sectionTitle: { color: isDark ? '#FFFFFF' : '#111827' },
   };
 
   const travelNews = [
-    { title: 'Global Travel Update', subtitle: 'New visa-free routes for 2026', image: 'https://images.unsplash.com/photo-1502602898657-3e917247a184?w=800&q=80' },
-    { title: 'Dubai Luxury Deals', subtitle: 'Save 40% on Burj Al Arab packages', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80' },
-    { title: 'Beirut Summer Spirit', subtitle: 'Festivals starting in Lebanon soon', image: 'https://images.unsplash.com/photo-1590076214537-1e3c7c996e41?w=800&q=80' },
-    { title: 'Bali Eco-Resorts', subtitle: 'New sustainable stay options open', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80' },
-    { title: 'Santorini Sunsets', subtitle: 'Best spots for 2026 revealed', image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&q=80' },
-    { title: 'Swiss Alps Winter', subtitle: 'Early booking discounts now live', image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a2?w=800&q=80' },
-    { title: 'Tokyo Tech Expo', subtitle: 'Explore the future of travel tech', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80' },
-    { title: 'Maldives Marine Life', subtitle: 'Snorkeling with whale sharks guide', image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80' },
-    { title: 'London Culture Week', subtitle: 'Museums opening late this month', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80' },
-    { title: 'Paris Luxury Getaway', subtitle: 'Luxury hotel stays during fashion week', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=800&q=80' },
+    { title: 'ecommerco.ai V2 Launch', subtitle: 'The new standard in Enterprise SaaS', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80' },
+    { title: 'Imperial Engine Handshake', subtitle: 'Real-time price brokerage activated', image: 'https://images.unsplash.com/photo-1551288049-bbbda536339a?w=800&q=80' },
+    { title: 'Global Node Clusters', subtitle: 'New low-latency servers in Beirut & Dubai', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=800&q=80' },
+    { title: 'Zero-Compute Architecture', subtitle: 'The future of local IDE development', image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80' },
   ];
 
   const loadRealData = async () => {
@@ -182,8 +177,8 @@ export default function HomeScreen() {
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={onRefresh} 
-            tintColor={Colors.primary}
-            colors={[Colors.primary]} 
+            tintColor={primaryColor}
+            colors={[primaryColor]} 
           />
         }
       >
@@ -229,6 +224,43 @@ export default function HomeScreen() {
         </View>
 
         {/* Quick Actions moved over Featured Destinations */}
+        {/* Imperial Dining Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Imperial Dining (Bon Appétit!)</Text>
+            <TouchableOpacity onPress={() => Alert.alert('Dining Hub', 'Booking a table at Raouche Rocks or Burj Al Arab? Coming soon!')}>
+              <Text style={styles.seeAll}>See All →</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardList}>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Raouche Rocks', 'Booking available from June 2026')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Lebanese Mezze</Text>
+               <Text style={styles.foodLocation}>Beirut, Lebanon</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Imperial Grill', 'Private chef sessions available')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Imperial Grill</Text>
+               <Text style={styles.foodLocation}>Dubai, UAE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Luxury Dining', 'Undersea restaurant booking')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Luxury Cocktails</Text>
+               <Text style={styles.foodLocation}>Maldives</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Sky Dining', 'Dinner in the sky experience')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Sky Terrace</Text>
+               <Text style={styles.foodLocation}>London, UK</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.foodCard} onPress={() => Alert.alert('Authentic Pasta', 'Traditional Italian cuisine')}>
+               <Image source={{ uri: 'https://images.unsplash.com/photo-1473093226795-af9932fe5856?w=400&q=80' }} style={styles.foodImage} />
+               <Text style={[styles.foodName, dynamicStyles.text]}>Italian Bistro</Text>
+               <Text style={styles.foodLocation}>Rome, Italy</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { paddingHorizontal: 20, marginBottom: 12 }]}>Quick Actions</Text>
           <View style={[styles.actionGrid, { paddingHorizontal: 20 }]}>
@@ -240,12 +272,12 @@ export default function HomeScreen() {
                 style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
                 onPress={() => router.push('/search')}
               >
-                <Ionicons name="airplane" size={24} color={Colors.primary} style={styles.actionIconIonic} />
+                <Ionicons name="airplane" size={24} color={primaryColor} style={styles.actionIconIonic} />
                 <Text style={[styles.actionText, dynamicStyles.text]}>Flights</Text>
               </TouchableOpacity>
             </Animated.View>
             
-            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginHorizontal: 10 }}>
+            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: 10 }}>
               <TouchableOpacity 
                 activeOpacity={0.7}
                 onPressIn={handlePressIn}
@@ -253,12 +285,12 @@ export default function HomeScreen() {
                 style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
                 onPress={() => router.push('/search')}
               >
-                <Ionicons name="business" size={24} color={Colors.primary} style={styles.actionIconIonic} />
+                <Ionicons name="business" size={24} color={primaryColor} style={styles.actionIconIonic} />
                 <Text style={[styles.actionText, dynamicStyles.text]}>Hotels</Text>
               </TouchableOpacity>
             </Animated.View>
 
-            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
+            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: 10 }}>
               <TouchableOpacity 
                 activeOpacity={0.7}
                 onPressIn={handlePressIn}
@@ -266,8 +298,21 @@ export default function HomeScreen() {
                 style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
                 onPress={() => router.push('/search')}
               >
-                <Ionicons name="map" size={24} color={Colors.primary} style={styles.actionIconIonic} />
+                <Ionicons name="map" size={24} color={primaryColor} style={styles.actionIconIonic} />
                 <Text style={[styles.actionText, dynamicStyles.text]}>Packages</Text>
+              </TouchableOpacity>
+            </Animated.View>
+
+            <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }], marginLeft: 10 }}>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                style={[styles.actionCard, { backgroundColor: isDark ? '#0A0A0A' : '#FFFFFF', borderColor: isDark ? '#1A1A1A' : '#F3F4F6' }]} 
+                onPress={() => Alert.alert('Imperial Dining', 'Exclusive restaurants and food tours coming soon! Bon appétit!')}
+              >
+                <Ionicons name="restaurant" size={24} color="#EF4444" style={styles.actionIconIonic} />
+                <Text style={[styles.actionText, dynamicStyles.text]}>Dining</Text>
               </TouchableOpacity>
             </Animated.View>
           </View>
@@ -282,7 +327,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
           {loading ? (
-            <ActivityIndicator size="small" color={Colors.primary} style={{ marginVertical: 20 }} />
+            <ActivityIndicator size="small" color={primaryColor} style={{ marginVertical: 20 }} />
           ) : (
             <FlatList
               data={featured}
@@ -311,7 +356,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
           {loading ? (
-            <ActivityIndicator size="small" color={Colors.primary} style={{ marginVertical: 20 }} />
+            <ActivityIndicator size="small" color={primaryColor} style={{ marginVertical: 20 }} />
           ) : (
             <FlatList
               data={popular}
@@ -493,6 +538,25 @@ const styles = StyleSheet.create({
   },
   cardList: {
     paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  foodCard: {
+    width: 150,
+    marginRight: 15,
+  },
+  foodImage: {
+    width: 150,
+    height: 100,
+    borderRadius: 16,
+    marginBottom: 8,
+  },
+  foodName: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  foodLocation: {
+    fontSize: 12,
+    color: '#666',
   },
   actionGrid: {
     flexDirection: 'row',

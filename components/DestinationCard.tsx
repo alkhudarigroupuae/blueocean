@@ -9,8 +9,9 @@ interface DestinationCardProps {
 }
 
 export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, onPress }) => {
-  const { theme } = useStore();
+  const { theme, apiSettings } = useStore();
   const isDark = theme === 'dark';
+  const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
 
   return (
     <TouchableOpacity style={[styles.card, isDark && { backgroundColor: '#0A0A0A', borderColor: '#1A1A1A' }]} onPress={onPress} activeOpacity={0.9}>
@@ -18,7 +19,7 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, o
       <View style={styles.overlay}>
         <View style={styles.content}>
           <View style={[styles.ratingContainer, isDark && { backgroundColor: 'rgba(0,0,0,0.8)' }]}>
-            <Text style={styles.rating}>★ {destination.rating}</Text>
+            <Text style={[styles.rating, { color: primaryColor }]}>★ {destination.rating}</Text>
           </View>
           <Text style={styles.name}>{destination.name}</Text>
           <Text style={styles.location}>{destination.country}</Text>
