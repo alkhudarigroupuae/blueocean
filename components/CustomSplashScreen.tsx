@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, Animated, Dimensions, Image, Platform } from 'react-native';
 import { useStore } from '../store';
 
 const { width, height } = Dimensions.get('window');
@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
   logoContainer: {
     width: 100,
     height: 100,
-    backgroundColor: '#FFD400', // CEO's Yellow
+    backgroundColor: '#ed7430', // CEO's Orange
     borderRadius: 20, // More modern rounded square
     padding: 0,
     marginBottom: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FFD400',
+    shadowColor: '#ed7430',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.2,
     shadowRadius: 30,
@@ -165,14 +165,14 @@ const styles = StyleSheet.create({
   brandName: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#FFD400', // CEO's Yellow
+    color: '#ed7430', // CEO's Orange
     letterSpacing: 6,
     textAlign: 'center',
   },
   divider: {
     width: 60,
     height: 1, // Thinner line
-    backgroundColor: 'rgba(255, 212, 0, 0.3)', // Faded yellow
+    backgroundColor: 'rgba(237, 116, 48, 0.3)', // Faded orange
     marginVertical: 20,
     borderRadius: 2,
   },
@@ -219,6 +219,6 @@ const styles = StyleSheet.create({
   loader: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#FFD400',
+    backgroundColor: '#ed7430',
   },
 });

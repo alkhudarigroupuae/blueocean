@@ -1,8 +1,8 @@
 // Theme Colors
 export const Colors = {
-  primary: '#FFD400', // CEO's Yellow
+  primary: '#ed7430', // CEO's Orange
   secondary: '#FFFFFF', // Clean White for Imperial look
-  accent: '#FFD400', 
+  accent: '#ed7430', 
   background: '#000000', // OLED Pure Black
   backgroundLight: '#0A0A0A', // Near Black
   text: '#FFFFFF',

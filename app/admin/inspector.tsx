@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   headerTitle: {
-    color: '#FFD400',
+    color: '#ed7430',
     fontSize: 18,
     fontWeight: '900',
   },
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: '#FFD400',
+    borderBottomColor: '#ed7430',
   },
   tabText: {
     color: '#444',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   activeTabText: {
-    color: '#FFD400',
+    color: '#ed7430',
   },
   scrollContent: {
     padding: 20,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   imageBadgeText: {
-    color: '#FFD400',
+    color: '#ed7430',
     fontSize: 10,
     fontWeight: '700',
   },

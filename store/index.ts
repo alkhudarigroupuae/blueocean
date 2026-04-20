@@ -172,7 +172,7 @@ export const useStore = create<AppState>((set) => ({
     },
     branding: {
       logoType: 'Hybrid',
-      primaryColor: '#FFD400',
+      primaryColor: '#ed7430',
       companyName: 'ecommerco.ai',
       tagline: 'Imperial Enterprise & Brokerage Platform',
     },
@@ -184,7 +184,7 @@ export const useStore = create<AppState>((set) => ({
         apiKey: '6f2fcbc34fmsh738b32a4809cc60p13f140jsnb1110a344209',
         branding: {
           logoType: 'Hybrid',
-          primaryColor: '#FFD400',
+          primaryColor: '#ed7430',
           tagline: 'Imperial Enterprise & Brokerage Platform',
         }
       }

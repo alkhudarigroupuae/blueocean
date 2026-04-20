@@ -106,7 +106,7 @@ export default function AdminDashboard() {
       apiKey: newApiKey,
       branding: {
         logoType: 'Hybrid' as const,
-        primaryColor: '#FFD400',
+        primaryColor: '#ed7430',
         tagline: `Powered by ecommerco.ai | ${newCompanyDomain}`,
       }
     };
@@ -217,14 +217,14 @@ export default function AdminDashboard() {
 
               <Text style={[styles.inputLabel, dynamicStyles.subText, { marginTop: 30 }]}>PRIMARY BRAND COLOR</Text>
               <View style={styles.colorRow}>
-                {['#FFD400', '#FFFFFF', '#10B981', '#6366F1', '#F59E0B', '#EF4444'].map((color) => (
+                {['#ed7430', '#FFFFFF', '#10B981', '#6366F1', '#F59E0B', '#EF4444'].map((color) => (
                   <TouchableOpacity 
                     key={color}
                     style={[styles.colorCircle, { backgroundColor: color }, apiSettings.branding.primaryColor === color && styles.activeColorCircle]}
                     onPress={() => updateApiSettings({ branding: { ...apiSettings.branding, primaryColor: color } })}
                   >
                     {apiSettings.branding.primaryColor === color && (
-                      <Ionicons name="checkmark" size={20} color={color === '#FFFFFF' || color === '#FFD400' ? '#000' : '#FFF'} />
+                      <Ionicons name="checkmark" size={20} color={color === '#FFFFFF' || color === '#ed7430' ? '#000' : '#FFF'} />
                     )}
                   </TouchableOpacity>
                 ))}

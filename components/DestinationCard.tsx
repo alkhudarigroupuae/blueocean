@@ -6,9 +6,10 @@ import { Destination, Colors } from '../types';
 interface DestinationCardProps {
   destination: Destination;
   onPress?: () => void;
+  size?: 'normal' | 'small';
 }
 
-export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, onPress }) => {
+export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, onPress, size = 'normal' }) => {
   const { theme, apiSettings } = useStore();
   const isDark = theme === 'dark';
   const primaryColor = apiSettings.branding.primaryColor || Colors.primary;
@@ -16,7 +17,7 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, o
   return (
     <TouchableOpacity 
       style={[
-        styles.card, 
+        size === 'small' ? styles.cardSmall : styles.card,
         isDark ? { 
           backgroundColor: '#0A0A0A', 
           borderColor: '#1A1A1A',
@@ -30,14 +31,14 @@ export const DestinationCard: React.FC<DestinationCardProps> = ({ destination, o
       onPress={onPress} 
       activeOpacity={0.9}
     >
-      <Image source={{ uri: destination.image }} style={styles.image} />
+      <Image source={{ uri: destination.image }} style={size === 'small' ? styles.imageSmall : styles.image} />
       <View style={styles.overlay}>
-        <View style={styles.content}>
-          <View style={[styles.ratingContainer, isDark && { backgroundColor: 'rgba(0,0,0,0.8)' }]}>
-            <Text style={[styles.rating, { color: primaryColor }]}>★ {destination.rating}</Text>
+        <View style={size === 'small' ? styles.contentSmall : styles.content}>
+          <View style={[size === 'small' ? styles.ratingContainerSmall : styles.ratingContainer, isDark && { backgroundColor: 'rgba(0,0,0,0.8)' }]}>
+            <Text style={[size === 'small' ? styles.ratingSmall : styles.rating, { color: primaryColor }]}>★ {destination.rating}</Text>
           </View>
-          <Text style={styles.name}>{destination.name}</Text>
-          <Text style={styles.location}>{destination.country}</Text>
+          <Text style={size === 'small' ? styles.nameSmall : styles.name}>{destination.name}</Text>
+          <Text style={size === 'small' ? styles.locationSmall : styles.location}>{destination.country}</Text>
           <View style={styles.priceTag}>
             <View>
               <Text style={styles.priceLabel}>Starting from</Text>
@@ -65,7 +66,19 @@ const styles = StyleSheet.create({
     marginRight: 16,
     backgroundColor: Colors.backgroundLight,
   },
+  cardSmall: {
+    width: 200,
+    height: 140,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginRight: 12,
+    backgroundColor: Colors.backgroundLight,
+  },
   image: {
+    width: '100%',
+    height: '100%',
+  },
+  imageSmall: {
     width: '100%',
     height: '100%',
   },
@@ -77,6 +90,9 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
   },
+  contentSmall: {
+    padding: 12,
+  },
   ratingContainer: {
     position: 'absolute',
     top: 12,
@@ -86,10 +102,24 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
+  ratingContainerSmall: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
   rating: {
     color: Colors.accent,
     fontWeight: '700',
     fontSize: 13,
+  },
+  ratingSmall: {
+    color: Colors.accent,
+    fontWeight: '700',
+    fontSize: 11,
   },
   name: {
     fontSize: 20,
@@ -97,10 +127,21 @@ const styles = StyleSheet.create({
     color: Colors.white,
     marginBottom: 2,
   },
+  nameSmall: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.white,
+    marginBottom: 1,
+  },
   location: {
     fontSize: 14,
     color: 'rgba(255,255,255,0.9)',
     marginBottom: 8,
+  },
+  locationSmall: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: 6,
   },
   priceTag: {
     flexDirection: 'row',

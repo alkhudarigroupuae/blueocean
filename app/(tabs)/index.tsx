@@ -59,8 +59,8 @@ export default function HomeScreen() {
   const loadRealData = async () => {
     try {
       const realData = await getFeaturedDestinations();
-      setFeatured(realData.slice(0, 5));
-      setPopular(realData.slice(5, 10));
+      setFeatured(realData.slice(0, 20));
+      setPopular(realData.slice(20, 30));
       setDestinations(realData);
     } catch (error) {
       console.error(error);
@@ -252,19 +252,26 @@ export default function HomeScreen() {
               { name: 'Lebanese Mezze', location: 'Beirut, Lebanon', img: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?w=400&q=80' },
               { name: 'Imperial Grill', location: 'Dubai, UAE', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80' },
               { name: 'Al Mahara', location: 'Dubai, UAE', img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80' },
+              { name: 'Sushi Zen', location: 'Tokyo, Japan', img: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&q=80' },
+              { name: 'Bella Vista', location: 'Rome, Italy', img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80' },
+              { name: 'Spice Garden', location: 'Mumbai, India', img: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80' },
+              { name: 'La Petite', location: 'Paris, France', img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80' },
+              { name: 'Taco Libre', location: 'Mexico City, Mexico', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80' },
+              { name: 'Golden Dragon', location: 'Beijing, China', img: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400&q=80' },
+              { name: 'Nordic Kitchen', location: 'Stockholm, Sweden', img: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=400&q=80' },
             ].map((item, i) => (
               <TouchableOpacity 
                 key={i} 
-                style={[styles.foodCard, dynamicStyles.card]} 
+                style={[styles.foodCardSmall, dynamicStyles.card]} 
                 onPress={() => {
                   setSearchQuery(item.name);
                   router.push('/search');
                 }}
               >
-                <Image source={{ uri: item.img }} style={styles.foodImage} />
-                <View style={{ padding: 12 }}>
-                    <Text style={[styles.foodName, dynamicStyles.text]}>{item.name}</Text>
-                    <Text style={[styles.foodLocation, dynamicStyles.subText]}>{item.location}</Text>
+                <Image source={{ uri: item.img }} style={styles.foodImageSmall} />
+                <View style={{ padding: 8 }}>
+                    <Text style={[styles.foodNameSmall, dynamicStyles.text]}>{item.name}</Text>
+                    <Text style={[styles.foodLocationSmall, dynamicStyles.subText]}>{item.location}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -287,12 +294,13 @@ export default function HomeScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item) => item.id}
-              snapToInterval={width * 0.8 + 20}
+              snapToInterval={width * 0.6 + 16}
               decelerationRate="fast"
               renderItem={({ item }) => (
                 <DestinationCard
                   destination={item}
                   onPress={() => handleDestinationPress(item.id)}
+                  size="small"
                 />
               )}
               contentContainerStyle={styles.cardList}
@@ -478,17 +486,35 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
+  foodCardSmall: {
+    width: 140,
+    marginRight: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
   foodImage: {
     width: '100%',
     height: 120,
+  },
+  foodImageSmall: {
+    width: '100%',
+    height: 80,
   },
   foodName: {
     fontSize: 15,
     fontWeight: '800',
   },
+  foodNameSmall: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
   foodLocation: {
     fontSize: 12,
     marginTop: 2,
+  },
+  foodLocationSmall: {
+    fontSize: 10,
+    marginTop: 1,
   },
   actionGrid: {
     flexDirection: 'row',

@@ -174,7 +174,7 @@ export default function SearchScreen() {
               style={styles.suggestionItem}
               onPress={() => handleSuggestionPress(item)}
             >
-              <Ionicons name="location-outline" size={20} color={isDark ? '#FFD400' : Colors.primary} style={styles.suggestionIconIonic} />
+              <Ionicons name="location-outline" size={20} color={isDark ? '#ed7430' : Colors.primary} style={styles.suggestionIconIonic} />
               <View>
                 <Text style={[styles.suggestionName, dynamicStyles.text]}>{item.name}</Text>
                 <Text style={[styles.suggestionCountry, dynamicStyles.subText]}>{item.country}</Text>
